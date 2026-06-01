@@ -3,437 +3,546 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>IA-UniData — Universidad de Puerto Rico</title>
+<title>UniData UPR — Business AI Prototype</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+ 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
+  :root {
+    --navy: #002147;
+    --navy-dark: #001530;
+    --navy-mid: #003166;
+    --green: #00a86b;
+    --green-dark: #007a4d;
+    --gold: #c9a84c;
+    --cream: #f5f0e8;
+    --cream-dark: #ede6d8;
+    --text: #1a1a2e;
+    --muted: #6b5f4e;
+  }
+ 
+  html { scroll-behavior: smooth; }
+ 
   body {
-    font-family: 'Georgia', 'Times New Roman', serif;
-    background: #f0ede6;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--cream);
+    color: var(--text);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
   }
-
-  /* TOP BAR */
-  .topbar {
-    background: #002147;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 52px;
-    flex-shrink: 0;
-  }
-  .topbar-left { display: flex; align-items: center; gap: 14px; }
-  .logo {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: linear-gradient(135deg, #00a86b, #007a4d);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px; font-weight: 900; color: #fff; font-family: Georgia, serif;
-  }
-  .topbar-title { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.05em; }
-  .topbar-sub { font-size: 9px; color: rgba(255,255,255,0.45); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
-  .topbar-right { display: flex; gap: 10px; }
-  .btn-ghost {
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 6px; padding: 5px 12px; color: rgba(255,255,255,0.7);
-    font-size: 11px; cursor: pointer; font-family: inherit;
-    transition: all 0.15s;
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,0.15); color: #fff; }
-
-  /* SYSTEMS PANEL */
-  .systems-panel {
-    background: #001a38;
+ 
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(0,33,71,0.97);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,0.08);
-    padding: 10px 24px;
-    display: none;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
+    padding: 0 40px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
   }
-  .systems-panel.visible { display: flex; }
-  .sys-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; font-family: sans-serif; }
-  .sys-item { display: flex; align-items: center; gap: 5px; }
-  .sys-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
-  .sys-name { font-size: 11px; color: rgba(255,255,255,0.6); font-family: sans-serif; }
-
-  /* MAIN */
-  .main {
-    max-width: 780px; width: 100%; margin: 0 auto;
-    padding: 24px 20px 20px;
-    flex: 1; display: flex; flex-direction: column;
+  .nav-brand { display: flex; align-items: center; gap: 12px; }
+  .nav-logo {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900; color: #fff;
+    font-family: 'DM Serif Display', serif;
+    box-shadow: 0 2px 12px rgba(0,168,107,0.4);
   }
-
-  /* USER BADGE */
-  .user-badge {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 20px; padding: 10px 16px;
-    background: #fff; border-radius: 10px;
-    border: 1px solid #ddd6c8; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  .nav-name { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
+  .nav-links { display: flex; align-items: center; gap: 6px; }
+  .nav-link {
+    padding: 7px 16px; border-radius: 8px; font-size: 13px;
+    color: rgba(255,255,255,0.65); text-decoration: none;
+    transition: all 0.15s; font-weight: 500;
+    border: 1px solid transparent;
   }
-  .user-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    background: #002147; display: flex; align-items: center;
-    justify-content: center; font-size: 12px; font-weight: 700;
-    color: #fff; font-family: Georgia, serif; flex-shrink: 0;
+  .nav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+  .nav-cta {
+    padding: 8px 18px; border-radius: 8px; font-size: 13px;
+    color: #fff; text-decoration: none; font-weight: 600;
+    background: var(--green); border: none;
+    transition: all 0.2s; margin-left: 8px;
+    box-shadow: 0 2px 8px rgba(0,168,107,0.35);
   }
-  .user-name { font-size: 13px; font-weight: 700; color: #1a1a2e; }
-  .user-dept { font-size: 10px; color: #7c6f5a; letter-spacing: 0.05em; }
-  .user-status { margin-left: auto; display: flex; align-items: center; gap: 5px; }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; }
-  .status-text { font-size: 10px; color: #7c6f5a; font-family: sans-serif; }
-
-  /* CHAT CONTAINER */
-  .chat-container {
-    background: #fff; border-radius: 14px;
-    border: 1px solid #ddd6c8; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-    display: flex; flex-direction: column; overflow: hidden;
-    flex: 1;
+  .nav-cta:hover { background: var(--green-dark); transform: translateY(-1px); }
+ 
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 50%, #003d7a 100%);
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; padding: 100px 24px 80px;
+    position: relative; overflow: hidden;
   }
-
-  /* MESSAGES */
-  .messages {
-    flex: 1; overflow-y: auto; padding: 22px 22px 10px;
-    display: flex; flex-direction: column; gap: 18px;
-    max-height: 440px; min-height: 300px;
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(0,168,107,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(201,168,76,0.08) 0%, transparent 60%);
   }
-  .msg-row { display: flex; gap: 12px; align-items: flex-start; }
-  .msg-row.user { justify-content: flex-end; }
-
-  .msg-avatar-ai {
-    width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
-    background: linear-gradient(135deg, #002147, #003d7a);
+  .hero-grid {
+    position: absolute; inset: 0; opacity: 0.04;
+    background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 760px; }
+ 
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 30px; padding: 7px 18px; margin-bottom: 32px;
+    font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+ 
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(42px, 7vw, 80px);
+    line-height: 1.05; color: #fff;
+    margin-bottom: 10px; letter-spacing: -0.02em;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold); }
+ 
+  .hero-sub {
+    font-size: clamp(16px, 2.5vw, 20px); color: rgba(255,255,255,0.55);
+    margin-bottom: 16px; font-weight: 300; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hero-desc {
+    font-size: clamp(14px, 2vw, 17px); color: rgba(255,255,255,0.65);
+    line-height: 1.7; max-width: 560px; margin: 0 auto 48px;
+    font-weight: 400;
+  }
+ 
+  .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 12px;
+    background: var(--green); color: #fff;
+    font-size: 14px; font-weight: 700; text-decoration: none;
+    transition: all 0.2s; box-shadow: 0 4px 20px rgba(0,168,107,0.4);
+    border: none; cursor: pointer; font-family: inherit;
+  }
+  .btn-primary:hover { background: var(--green-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,168,107,0.5); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 12px;
+    background: transparent; color: rgba(255,255,255,0.85);
+    font-size: 14px; font-weight: 600; text-decoration: none;
+    transition: all 0.2s; border: 1px solid rgba(255,255,255,0.25);
+    cursor: pointer; font-family: inherit;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); transform: translateY(-2px); }
+ 
+  .hero-scroll {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    color: rgba(255,255,255,0.3); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+  }
+ 
+  /* DEMOS SECTION */
+  .section { padding: 100px 24px; }
+  .section-inner { max-width: 1000px; margin: 0 auto; }
+ 
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--green);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 5vw, 48px); color: var(--navy);
+    line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.02em;
+  }
+  .section-desc {
+    font-size: 16px; color: var(--muted); line-height: 1.7;
+    max-width: 520px; margin-bottom: 56px;
+  }
+ 
+  .demos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+ 
+  .demo-card {
+    border-radius: 20px; overflow: hidden;
+    border: 1px solid rgba(0,33,71,0.1);
+    transition: all 0.3s; text-decoration: none;
+    display: block; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  }
+  .demo-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(0,0,0,0.12); }
+ 
+  .demo-card-header {
+    padding: 32px 28px 24px;
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .demo-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .demo-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
+    display: inline-block; width: fit-content;
+  }
+  .demo-card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px; line-height: 1.2; letter-spacing: -0.01em;
+  }
+  .demo-card-desc { font-size: 14px; line-height: 1.65; opacity: 0.8; }
+  .demo-card-body { padding: 20px 28px 28px; }
+ 
+  .demo-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .demo-feature { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .feature-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+ 
+  .demo-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 10px; font-size: 13px;
+    font-weight: 700; text-decoration: none; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .arrow { font-size: 16px; transition: transform 0.2s; }
+  .demo-card:hover .arrow { transform: translateX(4px); }
+ 
+  /* CARD 1 — IA UniData */
+  .card-ia .demo-card-header { background: linear-gradient(135deg, var(--navy-dark), var(--navy-mid)); }
+  .card-ia .demo-icon { background: rgba(0,168,107,0.15); }
+  .card-ia .demo-tag { background: rgba(0,168,107,0.15); color: #00c97f; }
+  .card-ia .demo-card-title { color: #fff; }
+  .card-ia .demo-card-desc { color: rgba(255,255,255,0.65); }
+  .card-ia .demo-card-body { background: #fff; }
+  .card-ia .demo-feature { color: var(--text); }
+  .card-ia .feature-dot { background: var(--green); }
+  .card-ia .demo-cta { background: var(--navy); color: #fff; }
+  .card-ia .demo-cta:hover { background: var(--navy-mid); }
+ 
+  /* CARD 2 — Sala de Junta */
+  .card-junta .demo-card-header { background: linear-gradient(135deg, #080d1a, #1a1040); }
+  .card-junta .demo-icon { background: rgba(99,102,241,0.15); }
+  .card-junta .demo-tag { background: rgba(99,102,241,0.15); color: #818cf8; }
+  .card-junta .demo-card-title { color: #fff; }
+  .card-junta .demo-card-desc { color: rgba(255,255,255,0.55); }
+  .card-junta .demo-card-body { background: #f8f7ff; }
+  .card-junta .demo-feature { color: var(--text); }
+  .card-junta .feature-dot { background: #6366f1; }
+  .card-junta .demo-cta { background: #6366f1; color: #fff; }
+  .card-junta .demo-cta:hover { background: #4f46e5; }
+ 
+  /* TEAM SECTION */
+  .team-section {
+    padding: 100px 24px;
+    background: var(--navy-dark);
+  }
+  .team-inner { max-width: 1000px; margin: 0 auto; }
+  .team-section .section-title { color: #fff; }
+  .team-section .section-desc { color: rgba(255,255,255,0.5); }
+  .team-section .section-label { color: var(--gold); }
+ 
+  .team-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .team-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 28px 22px;
+    transition: all 0.2s;
+  }
+  .team-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-3px); }
+  .team-avatar {
+    width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #fff;
+    font-family: 'DM Serif Display', serif;
+    margin-bottom: 16px;
+  }
+  .team-role {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .team-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: #fff; margin-bottom: 8px; line-height: 1.2;
+  }
+  .team-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+ 
+  /* PROBLEM SECTION */
+  .problem-section { padding: 100px 24px; background: var(--cream-dark); }
+  .problem-inner { max-width: 1000px; margin: 0 auto; }
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+  .problem-card {
+    background: #fff; border-radius: 16px; padding: 28px 24px;
+    border: 1px solid rgba(0,33,71,0.08);
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  }
+  .problem-icon { font-size: 28px; margin-bottom: 14px; }
+  .problem-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .problem-text { font-size: 13px; color: var(--muted); line-height: 1.65; }
+ 
+  /* MISSION */
+  .mission-section {
+    padding: 80px 24px;
+    background: linear-gradient(135deg, var(--green-dark), var(--green));
+    text-align: center;
+  }
+  .mission-inner { max-width: 700px; margin: 0 auto; }
+  .mission-label { font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 20px; }
+  .mission-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 4vw, 36px); color: #fff;
+    line-height: 1.4; font-style: italic;
+  }
+ 
+  /* FOOTER */
+  footer {
+    background: var(--navy-dark);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 32px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 10px; }
+  .footer-logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
     display: flex; align-items: center; justify-content: center;
     font-size: 14px; font-weight: 900; color: #fff;
-    font-family: Georgia, serif; margin-top: 2px;
-    box-shadow: 0 2px 8px rgba(0,33,71,0.25);
+    font-family: 'DM Serif Display', serif;
   }
-  .msg-avatar-user {
-    width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
-    background: #e8e0d4; display: flex; align-items: center;
-    justify-content: center; font-size: 11px; font-weight: 700;
-    color: #5a4f3e; margin-top: 2px; font-family: Georgia, serif;
+  .footer-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); }
+  .footer-text { font-size: 11px; color: rgba(255,255,255,0.3); }
+ 
+  @media (max-width: 680px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .demos-grid { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+    .problem-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
   }
-
-  .bubble {
-    max-width: 76%; padding: 14px 18px;
-    font-size: 13.5px; line-height: 1.7;
-    font-family: Georgia, serif;
-  }
-  .bubble.ai {
-    border-radius: 4px 16px 16px 16px;
-    background: #f8f5f0; color: #1a1a2e;
-    border: 1px solid #e8e0d4;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  .bubble.user-msg {
-    border-radius: 16px 4px 16px 16px;
-    background: #002147; color: #e8f0fe;
-    padding: 12px 16px;
-    box-shadow: 0 2px 8px rgba(0,33,71,0.2);
-  }
-
-  /* TYPING */
-  .typing-row { display: flex; gap: 12px; align-items: flex-start; }
-  .typing-bubble {
-    padding: 14px 18px; border-radius: 4px 16px 16px 16px;
-    background: #f8f5f0; border: 1px solid #e8e0d4;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .typing-label { font-size: 11px; color: #7c6f5a; font-family: sans-serif; }
-  .dot {
-    width: 6px; height: 6px; border-radius: 50%; background: #002147;
-    animation: pulse 1.3s infinite;
-  }
-  .dot:nth-child(2) { animation-delay: 0.22s; }
-  .dot:nth-child(3) { animation-delay: 0.44s; }
-
-  /* QUICK QUERIES */
-  .quick-section {
-    padding: 0 22px 16px;
-    border-top: 1px solid #f0ebe3;
-  }
-  .quick-label {
-    font-size: 10px; color: #a09080; text-transform: uppercase;
-    letter-spacing: 0.1em; margin: 12px 0 8px; font-family: sans-serif;
-  }
-  .quick-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip {
-    font-size: 11px; padding: 6px 12px; border-radius: 20px;
-    background: #f8f5f0; border: 1px solid #ddd6c8; color: #5a4f3e;
-    cursor: pointer; font-family: Georgia, serif; transition: all 0.15s;
-    text-align: left; line-height: 1.4;
-  }
-  .chip:hover { background: #002147; color: #fff; border-color: #002147; }
-
-  /* INPUT AREA */
-  .input-area {
-    padding: 14px 18px 16px;
-    border-top: 1px solid #e8e0d4;
-    background: #faf7f3;
-    display: flex; gap: 10px; align-items: flex-end;
-  }
-  textarea {
-    flex: 1; background: #fff; border: 1px solid #ddd6c8;
-    border-radius: 10px; padding: 10px 14px; font-size: 13px;
-    color: #1a1a2e; resize: none; outline: none;
-    font-family: Georgia, serif; line-height: 1.5;
-    transition: border 0.15s;
-  }
-  textarea:focus { border-color: #002147; }
-  .send-btn {
-    padding: 10px 22px; border-radius: 10px; border: none;
-    font-size: 13px; font-weight: 700; cursor: pointer;
-    background: #002147; color: #fff;
-    font-family: Georgia, serif; transition: all 0.2s;
-    white-space: nowrap; letter-spacing: 0.02em;
-  }
-  .send-btn:disabled { background: #e8e0d4; color: #a09080; cursor: not-allowed; }
-  .send-btn:not(:disabled):hover { background: #003d7a; }
-
-  /* FOOTER */
-  .footer {
-    margin-top: 14px;
-    display: flex; justify-content: space-between;
-    align-items: center; flex-wrap: wrap; gap: 8px;
-  }
-  .footer span { font-size: 10px; color: #a09080; font-family: sans-serif; }
-
-  @keyframes pulse {
-    0%,80%,100% { opacity: .3; transform: scale(.8); }
-    40% { opacity: 1; transform: scale(1); }
-  }
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #c8bfb0; border-radius: 3px; }
 </style>
 </head>
 <body>
-
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="topbar-left">
-    <div class="logo">U</div>
-    <div>
-      <div class="topbar-title">IA-UniData</div>
-      <div class="topbar-sub">Universidad de Puerto Rico</div>
+ 
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">U</div>
+    <span class="nav-name">UniData UPR</span>
+  </div>
+  <div class="nav-links">
+    <a href="#demos" class="nav-link">Demos</a>
+    <a href="#problema" class="nav-link">El Problema</a>
+    <a href="#equipo" class="nav-link">El Equipo</a>
+    <a href="ia-unidata.html" class="nav-cta">Probar IA →</a>
+  </div>
+</nav>
+ 
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Business AI Prototype · TIHA · UPR Río Piedras
+    </div>
+    <div class="hero-sub">Presentamos</div>
+    <h1>Uni<em>Data</em> UPR</h1>
+    <p class="hero-desc">
+      Una plataforma de inteligencia artificial que centraliza y optimiza la comunicación
+      interdepartamental de la Universidad de Puerto Rico — eliminando los silos de información
+      que afectan la eficiencia institucional.
+    </p>
+    <div class="hero-btns">
+      <a href="ia-unidata.html" class="btn-primary">🤖 Probar IA-UniData</a>
+      <a href="sala-de-junta.html" class="btn-secondary">🏛️ Sala de Junta</a>
     </div>
   </div>
-  <div class="topbar-right">
-    <button class="btn-ghost" onclick="toggleSystems()">Sistemas conectados</button>
-    <button class="btn-ghost" onclick="resetChat()">Nueva sesión</button>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Explorar
   </div>
-</div>
-
-<!-- SYSTEMS PANEL -->
-<div class="systems-panel" id="systemsPanel">
-  <span class="sys-label">Sistemas activos:</span>
-  <div class="sys-item"><div class="sys-dot"></div><span class="sys-name">Registraduría</span></div>
-  <div class="sys-item"><div class="sys-dot"></div><span class="sys-name">Finanzas</span></div>
-  <div class="sys-item"><div class="sys-dot"></div><span class="sys-name">Decanato</span></div>
-  <div class="sys-item"><div class="sys-dot"></div><span class="sys-name">RR.HH.</span></div>
-  <div class="sys-item"><div class="sys-dot"></div><span class="sys-name">Servicios Est.</span></div>
-  <div class="sys-item"><div class="sys-dot"></div><span class="sys-name">Banner ERP</span></div>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- USER BADGE -->
-  <div class="user-badge">
-    <div class="user-avatar">CM</div>
-    <div>
-      <div class="user-name">Carmen Morales</div>
-      <div class="user-dept">Oficina de Registraduría · UPR Río Piedras</div>
+</section>
+ 
+<!-- PROBLEM -->
+<section class="problem-section" id="problema">
+  <div class="problem-inner">
+    <div class="section-label">El Problema</div>
+    <h2 class="section-title">La UPR opera en silos.<br>UniData los rompe.</h2>
+    <div class="section-desc">
+      Los departamentos de la UPR trabajan de forma aislada, con información fragmentada y procesos manuales que generan demoras, duplicación de esfuerzos y frustración institucional.
     </div>
-    <div class="user-status">
-      <div class="status-dot"></div>
-      <span class="status-text">En línea</span>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div class="chat-container">
-    <div class="messages" id="messages"></div>
-
-    <!-- QUICK QUERIES -->
-    <div class="quick-section" id="quickSection">
-      <div class="quick-label">Consultas frecuentes</div>
-      <div class="quick-chips">
-        <button class="chip" onclick="sendQuick(this)">¿Cuál es el estado de la solicitud de traslado del estudiante García Pérez?</button>
-        <button class="chip" onclick="sendQuick(this)">Necesito el contacto actualizado de la Oficina de Finanzas para un caso urgente</button>
-        <button class="chip" onclick="sendQuick(this)">¿Cuáles son las fechas límite para las apelaciones de grado este semestre?</button>
-        <button class="chip" onclick="sendQuick(this)">¿Hay alguna comunicación pendiente de Decanato para nuestra oficina?</button>
-        <button class="chip" onclick="sendQuick(this)">Un estudiante me pregunta por qué su matrícula no está procesada aún</button>
-        <button class="chip" onclick="sendQuick(this)">¿Qué formulario necesito para procesar un cambio de concentración tardío?</button>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📬</div>
+        <div class="problem-title">Correos perdidos entre oficinas</div>
+        <div class="problem-text">Las solicitudes interdepartamentales se pierden en bandejas de entrada sin seguimiento ni trazabilidad institucional.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">⏳</div>
+        <div class="problem-title">Procesos que tardan semanas</div>
+        <div class="problem-text">Aprobaciones simples requieren múltiples llamadas y reenvíos entre departamentos, impactando la experiencia de estudiantes y empleados.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🔁</div>
+        <div class="problem-title">Duplicación de esfuerzos</div>
+        <div class="problem-text">Sin un sistema centralizado, distintos departamentos recopilan y procesan la misma información por separado y sin coordinación.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🌐</div>
+        <div class="problem-title">Información desactualizada</div>
+        <div class="problem-text">Políticas, contactos y procesos cambian constantemente sin que todos los departamentos reciban actualizaciones oportunas y confiables.</div>
       </div>
     </div>
-
-    <!-- INPUT -->
-    <div class="input-area">
-      <textarea id="userInput" rows="2"
-        placeholder="Escribe tu consulta a IA-UniData… (Enter = enviar, Shift+Enter = nueva línea)"
-        onkeydown="handleKey(event)"></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">Enviar →</button>
+  </div>
+</section>
+ 
+<!-- DEMOS -->
+<section class="section" id="demos">
+  <div class="section-inner">
+    <div class="section-label">Prototipos Funcionales</div>
+    <h2 class="section-title">Dos demos listos<br>para explorar</h2>
+    <div class="section-desc">
+      Interactúa con nuestros prototipos funcionales impulsados por inteligencia artificial real.
+    </div>
+    <div class="demos-grid">
+ 
+      <!-- Card IA UniData -->
+      <a href="ia-unidata.html" class="demo-card card-ia">
+        <div class="demo-card-header">
+          <div class="demo-icon">🤖</div>
+          <div class="demo-tag">Sección 6 · Prototipo Funcional</div>
+          <div class="demo-card-title">IA-UniData<br>Assistant</div>
+          <div class="demo-card-desc">
+            Asistente conversacional que centraliza información institucional en tiempo real desde cualquier departamento de la UPR.
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="demo-features">
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Consultas interdepartamentales en segundos
+            </div>
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Seguimiento de trámites y solicitudes
+            </div>
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Acceso unificado a políticas y reglamentos
+            </div>
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Integración simulada con Banner y Moodle
+            </div>
+          </div>
+          <div class="demo-cta">
+            Probar demo <span class="arrow">→</span>
+          </div>
+        </div>
+      </a>
+ 
+      <!-- Card Sala de Junta -->
+      <a href="sala-de-junta.html" class="demo-card card-junta">
+        <div class="demo-card-header">
+          <div class="demo-icon">🏛️</div>
+          <div class="demo-tag">Sección 5 · Sala de Junta Simulada</div>
+          <div class="demo-card-title">Junta Ejecutiva<br>con IA</div>
+          <div class="demo-card-desc">
+            Tres altos funcionarios de la UPR debaten y analizan UniData UPR en una sesión ejecutiva simulada con IA real.
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="demo-features">
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Rector · CIO del Sistema · Decana Académica
+            </div>
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Mesa Redonda — los tres debaten entre sí
+            </div>
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Modo individual por stakeholder
+            </div>
+            <div class="demo-feature">
+              <div class="feature-dot"></div>
+              Perspectivas ejecutiva, técnica y académica
+            </div>
+          </div>
+          <div class="demo-cta">
+            Entrar a la junta <span class="arrow">→</span>
+          </div>
+        </div>
+      </a>
+ 
     </div>
   </div>
-
-  <!-- FOOTER -->
-  <div class="footer">
-    <span>IA-UniData · Prototipo Funcional · UniData UPR · Portafolio Sección 6</span>
-    <span>Luis Joel Castro · Nyctor Nazario · Liliana Benítez</span>
+</section>
+ 
+<!-- MISSION -->
+<section class="mission-section">
+  <div class="mission-inner">
+    <div class="mission-label">Nuestra Misión</div>
+    <p class="mission-text">
+      "Poner la inteligencia artificial al servicio de las personas que hacen funcionar la UPR todos los días."
+    </p>
   </div>
-</div>
-
-<script>
-const SYSTEM_PROMPT = `Eres IA-UniData, el asistente de inteligencia artificial de la Universidad de Puerto Rico (UPR) para la centralización y coordinación de información interdepartamental. Fuiste desarrollado por el equipo UniData UPR: Luis Joel Castro Rivera (CEO), Nyctor Nazario (CTO) y Liliana Benítez (COO).
-
-TU ROL:
-Ayudas a los empleados de la UPR a encontrar información, hacer seguimiento de trámites, coordinar entre departamentos y resolver dudas sin tener que llamar a múltiples oficinas o esperar días por un correo. Eres el punto central de conocimiento institucional de la UPR.
-
-CONTEXTO DEL USUARIO:
-El empleado que te consulta trabaja en la Oficina de Registraduría del Recinto de Río Piedras. Su nombre es Carmen Morales. Tiene 12 años trabajando en la UPR y está acostumbrada a los procesos lentos de comunicación interdepartamental.
-
-TU BASE DE CONOCIMIENTO (simula tener acceso a estos sistemas):
-- Estado de solicitudes de traslado de créditos entre recintos
-- Políticas y reglamentos académicos actualizados
-- Contactos y horarios de todas las oficinas del recinto
-- Estado de pagos y matrículas de estudiantes
-- Formularios y procesos administrativos de cada departamento
-- Fechas límite de procesos académicos del semestre
-- Estado de aprobaciones pendientes entre departamentos
-- Minutas y acuerdos de reuniones interdepartamentales recientes
-
-INSTRUCCIONES:
-- Responde SIEMPRE en español de Puerto Rico, tono profesional pero cercano
-- Simula tener acceso real a los sistemas — inventa datos realistas y específicos (nombres ficticios, fechas, números de casos) para que el demo se vea funcional
-- Cuando des información de un caso incluye: estado actual, último movimiento, próximos pasos y departamento responsable
-- Usa emojis institucionales sutiles: 📋 para trámites, 👤 para personas, 📅 para fechas, ✅ para resuelto, ⏳ para pendiente, 🔄 para en proceso
-- Máximo 6-8 oraciones por respuesta
-- Al final ofrece 1-2 acciones de seguimiento que puedes tomar`;
-
-let conversationHistory = [];
-let isLoading = false;
-
-// Add welcome message on load
-window.onload = function() {
-  addMessage('assistant', '¡Buenos días, Carmen! 👋 Soy <strong>IA-UniData</strong>, tu asistente de coordinación institucional de la UPR.\n\nTengo acceso en tiempo real a los sistemas de Registraduría, Finanzas, Decanato, Recursos Humanos y Servicios Estudiantiles. Ya no necesitas llamar a cada oficina por separado ni esperar días por un correo — puedo darte la información que necesitas ahora mismo.\n\n¿En qué puedo ayudarte hoy? 📋');
-};
-
-function toggleSystems() {
-  const panel = document.getElementById('systemsPanel');
-  panel.classList.toggle('visible');
-}
-
-function handleKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
-
-function sendQuick(btn) {
-  const text = btn.textContent;
-  document.getElementById('quickSection').style.display = 'none';
-  sendMessage(text);
-}
-
-function addMessage(role, content) {
-  const messages = document.getElementById('messages');
-
-  const row = document.createElement('div');
-  row.className = 'msg-row' + (role === 'user' ? ' user' : '');
-
-  if (role === 'assistant') {
-    row.innerHTML = `
-      <div class="msg-avatar-ai">U</div>
-      <div class="bubble ai">${content.replace(/\n/g, '<br>')}</div>
-    `;
-  } else {
-    row.innerHTML = `
-      <div class="bubble user-msg">${content.replace(/\n/g, '<br>')}</div>
-      <div class="msg-avatar-user">CM</div>
-    `;
-  }
-
-  messages.appendChild(row);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function showTyping() {
-  const messages = document.getElementById('messages');
-  const typing = document.createElement('div');
-  typing.className = 'typing-row';
-  typing.id = 'typingIndicator';
-  typing.innerHTML = `
-    <div class="msg-avatar-ai">U</div>
-    <div class="typing-bubble">
-      <span class="typing-label">Consultando sistemas</span>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
+</section>
+ 
+<!-- TEAM -->
+<section class="team-section" id="equipo">
+  <div class="team-inner">
+    <div class="section-label">El Equipo</div>
+    <h2 class="section-title">Quiénes somos</h2>
+    <p class="section-desc">
+      Estudiantes de la Universidad de Puerto Rico que identificaron un problema real y construyeron una solución con IA.
+    </p>
+    <div class="team-grid">
+ 
+      <div class="team-card">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#002147,#003d7a)">LJ</div>
+        <div class="team-role" style="color:#60a5fa">Chief Executive Officer</div>
+        <div class="team-name">Luis Joel Castro Rivera</div>
+        <div class="team-desc">Líder del equipo. Responsable de la visión estratégica, coordinación del proyecto y presentación ejecutiva de UniData UPR.</div>
+      </div>
+ 
+      <div class="team-card">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#2d1b5e,#4c1d95)">NN</div>
+        <div class="team-role" style="color:#a78bfa">Chief Technology Officer</div>
+        <div class="team-name">Nyctor Nazario</div>
+        <div class="team-desc">Responsable del desarrollo tecnológico, arquitectura de la plataforma e integración de inteligencia artificial en UniData UPR.</div>
+      </div>
+ 
+      <div class="team-card">
+        <div class="team-avatar" style="background:linear-gradient(135deg,#064e3b,#065f46)">LB</div>
+        <div class="team-role" style="color:#6ee7b7">Chief Operating Officer</div>
+        <div class="team-name">Liliana Benítez</div>
+        <div class="team-desc">Responsable de las operaciones, procesos institucionales y estrategia de implementación de UniData UPR en la UPR.</div>
+      </div>
+ 
     </div>
-  `;
-  messages.appendChild(typing);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function hideTyping() {
-  const t = document.getElementById('typingIndicator');
-  if (t) t.remove();
-}
-
-async function sendMessage(overrideText) {
-  const input = document.getElementById('userInput');
-  const text = (overrideText || input.value).trim();
-  if (!text || isLoading) return;
-
-  input.value = '';
-  isLoading = true;
-  document.getElementById('sendBtn').disabled = true;
-
-  addMessage('user', text);
-  conversationHistory.push({ role: 'user', content: text });
-  showTyping();
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: conversationHistory
-      })
-    });
-
-    const data = await response.json();
-    const reply = data.content?.find(b => b.type === 'text')?.text || 'Error al obtener respuesta.';
-
-    hideTyping();
-    conversationHistory.push({ role: 'assistant', content: reply });
-    addMessage('assistant', reply);
-
-  } catch (err) {
-    hideTyping();
-    addMessage('assistant', 'Error de conexión. Por favor verifica tu acceso a la API e intenta de nuevo.');
-  }
-
-  isLoading = false;
-  document.getElementById('sendBtn').disabled = false;
-  input.focus();
-}
-
-function resetChat() {
-  conversationHistory = [];
-  document.getElementById('messages').innerHTML = '';
-  document.getElementById('quickSection').style.display = '';
-  window.onload();
-}
-</script>
-
+  </div>
+</section>
+ 
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <div class="footer-logo">U</div>
+    <div>
+      <div class="footer-name">UniData UPR</div>
+      <div class="footer-text">Business AI Prototype · TIHA · UPR Río Piedras</div>
+    </div>
+  </div>
+  <div class="footer-text">Luis Joel Castro · Nyctor Nazario · Liliana Benítez · 2025</div>
+</footer>
+ 
 </body>
 </html>
+ 
