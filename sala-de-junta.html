@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sala de Junta — UniData UPR</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #080d1a;
+    min-height: 100vh;
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: linear-gradient(135deg, #080d1a, #1a1040);
+    border-bottom: 1px solid #1e293b;
+    padding: 0 22px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar-title { font-size: 17px; font-weight: 700; color: #f8fafc; letter-spacing: -0.3px; }
+  .topbar-sub { font-size: 11px; color: #475569; margin-top: 2px; }
+  .mode-btns { display: flex; gap: 8px; }
+  .mode-btn {
+    padding: 7px 16px; border-radius: 8px; font-size: 12px;
+    font-weight: 600; cursor: pointer; border: 1px solid #334155;
+    background: transparent; color: #94a3b8;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .mode-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+
+  /* MAIN */
+  .main { max-width: 880px; width: 100%; margin: 0 auto; padding: 20px 18px 60px; }
+
+  /* SEAT CARDS */
+  .seats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+  .seat-card {
+    background: #0d1117; border-radius: 14px; padding: 16px 14px;
+    border: 2px solid transparent; cursor: pointer;
+    transition: all 0.2s; text-align: left;
+  }
+  .seat-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    margin-bottom: 10px; border: 2px solid;
+  }
+  .seat-name { font-size: 12px; font-weight: 700; color: #f1f5f9; line-height: 1.3; margin-bottom: 3px; }
+  .seat-role { font-size: 10px; color: #64748b; line-height: 1.3; margin-bottom: 8px; }
+  .seat-tag {
+    font-size: 9px; padding: 3px 10px; border-radius: 20px;
+    display: inline-block; font-weight: 700; letter-spacing: 0.04em;
+  }
+  .seat-badge { margin-top: 8px; font-size: 11px; font-weight: 600; }
+
+  /* FEED / CHAT BOX */
+  .box {
+    background: #0d1117; border-radius: 16px;
+    border: 1px solid #1e293b; overflow: hidden;
+  }
+  .box-header {
+    background: linear-gradient(135deg,#150d3a,#0f2040);
+    padding: 13px 20px; border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .box-header-title { font-size: 13px; font-weight: 700; color: #c4b5fd; }
+  .box-header-sub { font-size: 11px; color: #475569; margin-top: 2px; }
+  .rounds-badge {
+    font-size: 11px; color: #475569; background: #111827;
+    padding: 4px 12px; border-radius: 20px;
+  }
+
+  /* FEED */
+  .feed {
+    min-height: 220px; max-height: 460px; overflow-y: auto; padding: 20px;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .feed-empty { text-align: center; padding: 60px 20px; }
+  .feed-empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .feed-empty-title { font-size: 14px; color: #475569; font-weight: 600; }
+  .feed-empty-sub { font-size: 12px; color: #334155; margin-top: 5px; }
+
+  .round-block {
+    background: #080d1a; border-radius: 14px;
+    border: 1px solid #1e293b; overflow: hidden;
+  }
+  .round-header {
+    padding: 9px 16px; background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .round-num { font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+  .round-q { font-size: 11px; color: #6366f1; font-style: italic; }
+
+  .response-item {
+    padding: 14px 18px; border-bottom: 1px solid #0d1117;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .response-item:last-child { border-bottom: none; }
+  .resp-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+    border: 2px solid;
+  }
+  .resp-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+  .resp-role { font-size: 10px; color: #475569; font-weight: 400; margin-left: 8px; }
+  .resp-text { font-size: 13px; color: #cbd5e1; line-height: 1.7; }
+
+  .typing-row {
+    padding: 14px 18px; display: flex; gap: 12px; align-items: center;
+  }
+  .typing-name { font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .dots { display: flex; gap: 5px; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    animation: pulse 1.3s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.22s; }
+  .dot:nth-child(3) { animation-delay: 0.44s; }
+
+  /* INPUT */
+  .input-area {
+    border-top: 1px solid #1e293b; padding: 14px 18px;
+    background: #0d1117;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+  .chip {
+    font-size: 11px; padding: 5px 12px; border-radius: 20px;
+    background: #111827; border: 1px solid #1e293b; color: #64748b;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .chip:hover { border-color: #6366f1; color: #a5b4fc; }
+  .input-row { display: flex; gap: 10px; }
+  textarea {
+    flex: 1; background: #111827; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 10px 14px; font-size: 13px;
+    color: #f1f5f9; resize: none; outline: none;
+    font-family: inherit; transition: border 0.15s;
+  }
+  textarea:focus { border-color: #6366f1; }
+  .send-btn {
+    padding: 10px 22px; border-radius: 10px; border: none;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    background: #6366f1; color: #fff;
+    transition: all 0.2s; white-space: nowrap;
+    font-family: inherit;
+  }
+  .send-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
+  .send-btn:not(:disabled):hover { background: #4f46e5; }
+
+  /* INDIVIDUAL CHAT */
+  .chat-box { background: #0d1117; border-radius: 16px; overflow: hidden; border: 2px solid; }
+  .chat-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; }
+  .chat-header-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: rgba(255,255,255,0.12); border: 2px solid rgba(255,255,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .chat-header-name { font-size: 14px; font-weight: 700; color: #fff; }
+  .chat-header-role { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+  .chat-status { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+  .status-text { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  .chat-messages {
+    height: 360px; overflow-y: auto; padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .msg-row { display: flex; gap: 10px; align-items: flex-start; }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-avatar-ai {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+    flex-shrink: 0; margin-top: 2px; border: 2px solid;
+  }
+  .msg-avatar-user {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #4f46e5; display: flex; align-items: center;
+    justify-content: center; font-size: 10px; color: #c7d2fe;
+    flex-shrink: 0; margin-top: 2px; font-weight: 700;
+  }
+  .bubble {
+    max-width: 74%; padding: 11px 15px; border-radius: 14px;
+    font-size: 13px; line-height: 1.65;
+  }
+  .bubble.ai {
+    background: #111827; color: #d1d5db;
+    border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.06);
+  }
+  .bubble.user-msg {
+    background: #4f46e5; color: #e0e7ff;
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-input-area {
+    border-top: 1px solid #1e293b; padding: 12px 18px;
+    display: flex; gap: 10px; background: #0d1117;
+  }
+
+  .empty-state { text-align: center; padding: 52px 20px; }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; }
+  .empty-title { font-size: 14px; color: #475569; font-weight: 600; }
+  .empty-sub { font-size: 12px; color: #334155; margin-top: 4px; }
+
+  @keyframes pulse {
+    0%,80%,100%{ opacity:.3; transform:scale(.8); }
+    40%{ opacity:1; transform:scale(1); }
+  }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">🏛️ Junta Ejecutiva — UniData UPR</div>
+    <div class="topbar-sub">Rector · CIO del Sistema · Decana Académica &nbsp;·&nbsp; Portafolio Sección 5</div>
+  </div>
+  <div class="mode-btns">
+    <button class="mode-btn active" id="btnMesa" onclick="setMode('mesa')">⬡ Mesa Redonda</button>
+    <button class="mode-btn" id="btnInd" onclick="setMode('individual')">💬 Individual</button>
+  </div>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+<script>
+const STAKEHOLDERS = [
+  {
+    id: 'rector',
+    name: 'Dr. Marcos Reyes Dávila',
+    role: 'Rector — UPR Río Piedras',
+    initials: 'MR',
+    color: '#3b82f6',
+    bg: '#1a3a5c',
+    tagBg: 'rgba(59,130,246,0.15)',
+    tagColor: '#93c5fd',
+    tag: 'Máxima Autoridad Ejecutiva',
+    system: `Eres el Dr. Marcos Reyes Dávila, Rector de la Universidad de Puerto Rico, Recinto de Río Piedras. Tienes un doctorado en Administración Pública de Harvard y 30 años en educación superior. Estás en una sesión de junta donde el equipo de UniData UPR — Luis Joel Castro Rivera (CEO), Nyctor Nazario (CTO) y Liliana Benítez (COO) — son profesionales que presentan una propuesta para mejorar la comunicación interdepartamental mediante IA. Los tratas como colegas. Aprecias la iniciativa y haces preguntas estratégicas sobre escalabilidad a los 11 recintos, sostenibilidad financiera, acreditación Middle States y gobernanza institucional. Buscas fortalecer la propuesta, no bloquearla. Responde en español formal de Puerto Rico, máximo 5 oraciones, termina con 1 pregunta estratégica.`
+  },
+  {
+    id: 'cio',
+    name: 'Ing. Patricia Solís Vargas',
+    role: 'Chief Information Officer — UPR Sistema',
+    initials: 'PS',
+    color: '#8b5cf6',
+    bg: '#2d1b5e',
+    tagBg: 'rgba(139,92,246,0.15)',
+    tagColor: '#c4b5fd',
+    tag: 'CIO del Sistema UPR',
+    system: `Eres la Ing. Patricia Solís Vargas, Chief Information Officer del Sistema UPR. Tienes un doctorado del MIT y supervisas infraestructura tecnológica para más de 60,000 estudiantes. El equipo de UniData UPR — Luis Joel Castro Rivera (CEO), Nyctor Nazario (CTO) y Liliana Benítez (COO) — presenta una plataforma de IA para comunicación interdepartamental. Los tratas como colegas con criterio técnico. Valoras la iniciativa y haces preguntas de due diligence técnico: arquitectura, FERPA, ciberseguridad, integración con Banner y Moodle, marco ético de Floridi et al. (2021). Cuando debatas en mesa redonda, construye sobre lo dicho por otros. Responde en español técnico-ejecutivo de Puerto Rico, máximo 5 oraciones, termina con 1 pregunta técnica o ética.`
+  },
+  {
+    id: 'decana',
+    name: 'Dra. Isabel Fontánez Cruz',
+    role: 'Decana de Asuntos Académicos — UPR',
+    initials: 'IF',
+    color: '#10b981',
+    bg: '#064e3b',
+    tagBg: 'rgba(16,185,129,0.15)',
+    tagColor: '#6ee7b7',
+    tag: 'Decana — Voz Académica',
+    system: `Eres la Dra. Isabel Fontánez Cruz, Decana de Asuntos Académicos de la UPR Río Piedras. Tienes un doctorado de Columbia University y representas al claustro y personal universitario. El equipo de UniData UPR — Luis Joel Castro Rivera (CEO), Nyctor Nazario (CTO) y Liliana Benítez (COO) — presenta una solución que podría transformar positivamente la UPR. Reconoces los problemas de comunicación interdepartamental de primera mano. Apoyas la iniciativa y haces preguntas sobre gestión del cambio, equidad de acceso, impacto en empleados bajo convenio colectivo y si se consultó a usuarios reales. Cuando debatas en mesa redonda, aporta la dimensión humana. Responde en español académico-ejecutivo de Puerto Rico, máximo 5 oraciones, termina con 1 pregunta sobre impacto humano.`
+  }
+];
+
+const SUGGESTIONS = [
+  '¿Debería la UPR implementar UniData UPR este año académico?',
+  '¿Qué aspectos de la propuesta consideran más sólidos y cuáles necesitan más desarrollo?',
+  '¿Qué condiciones institucionales debe cumplir UniData antes de una aprobación formal?',
+  '¿Cómo evaluarían el impacto de UniData UPR en la comunidad universitaria a largo plazo?'
+];
+
+let mode = 'mesa';
+let rounds = [];
+let isLoading = false;
+let selectedId = null;
+let indConvs = { rector: [], cio: [], decana: [] };
+let indLoading = false;
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btnMesa').className = 'mode-btn' + (m === 'mesa' ? ' active' : '');
+  document.getElementById('btnInd').className = 'mode-btn' + (m === 'individual' ? ' active' : '');
+  render();
+}
+
+async function callClaude(system, messages) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system,
+      messages
+    })
+  });
+  const data = await res.json();
+  return data.content?.find(b => b.type === 'text')?.text || 'Error al obtener respuesta.';
+}
+
+async function sendMesa(override) {
+  const input = document.getElementById('mesaInput');
+  const q = (override || input?.value || '').trim();
+  if (!q || isLoading) return;
+  if (input) input.value = '';
+  isLoading = true;
+
+  const roundIdx = rounds.length;
+  rounds.push({ question: q, responses: [], typing: null });
+  render();
+
+  let prevResponse = '';
+
+  for (const sk of STAKEHOLDERS) {
+    rounds[roundIdx].typing = sk.id;
+    render();
+
+    const userMsg = prevResponse
+      ? `Tema: "${q}"\n\nEl funcionario anterior expresó: "${prevResponse}"\n\nComparte tu perspectiva institucional, construyendo sobre lo dicho.`
+      : `El equipo de UniData UPR presenta: "${q}". Ofrece tu análisis institucional.`;
+
+    try {
+      const reply = await callClaude(sk.system, [{ role: 'user', content: userMsg }]);
+      rounds[roundIdx].responses.push({ sk, text: reply });
+      prevResponse = reply;
+    } catch {
+      rounds[roundIdx].responses.push({ sk, text: 'Error de conexión.' });
+    }
+
+    rounds[roundIdx].typing = null;
+    render();
+  }
+
+  isLoading = false;
+  render();
+}
+
+async function sendInd() {
+  const input = document.getElementById('indInput');
+  const q = input?.value.trim();
+  if (!q || !selectedId || indLoading) return;
+  input.value = '';
+  indLoading = true;
+
+  const sk = STAKEHOLDERS.find(s => s.id === selectedId);
+  indConvs[selectedId].push({ role: 'user', content: q });
+  render();
+
+  try {
+    const reply = await callClaude(sk.system, indConvs[selectedId]);
+    indConvs[selectedId].push({ role: 'assistant', content: reply });
+  } catch {
+    indConvs[selectedId].push({ role: 'assistant', content: 'Error de conexión.' });
+  }
+
+  indLoading = false;
+  render();
+  scrollToBottom('chatMessages');
+}
+
+function scrollToBottom(id) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) el.scrollTop = el.scrollHeight;
+  }, 50);
+}
+
+function render() {
+  const main = document.getElementById('mainContent');
+  if (mode === 'mesa') {
+    main.innerHTML = renderMesa();
+    scrollToBottom('feedArea');
+  } else {
+    main.innerHTML = renderIndividual();
+    scrollToBottom('chatMessages');
+  }
+}
+
+function renderMesa() {
+  const seatsHTML = STAKEHOLDERS.map(sk => `
+    <div class="seat-card" style="border-color:${sk.color}20;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div class="seat-avatar" style="background:${sk.bg};border-color:${sk.color}">${sk.initials}</div>
+        <div>
+          <div class="seat-name">${sk.name}</div>
+          <div class="seat-role">${sk.role}</div>
+        </div>
+      </div>
+      <div class="seat-tag" style="background:${sk.tagBg};color:${sk.tagColor}">${sk.tag}</div>
+    </div>
+  `).join('');
+
+  const roundsHTML = rounds.map((r, ri) => `
+    <div class="round-block">
+      <div class="round-header">
+        <span class="round-num">Ronda ${ri + 1}</span>
+        <span class="round-q">"${r.question}"</span>
+      </div>
+      ${r.responses.map((resp, i) => `
+        <div class="response-item" style="${i < r.responses.length - 1 ? '' : 'border-bottom:none'}">
+          <div class="resp-avatar" style="background:${resp.sk.bg};border-color:${resp.sk.color}">${resp.sk.initials}</div>
+          <div style="flex:1">
+            <div class="resp-name" style="color:${resp.sk.color}">${resp.sk.name}<span class="resp-role">${resp.sk.role}</span></div>
+            <div class="resp-text">${resp.text.replace(/\n/g,'<br>')}</div>
+          </div>
+        </div>
+      `).join('')}
+      ${r.typing ? (() => {
+        const sk = STAKEHOLDERS.find(s => s.id === r.typing);
+        return `<div class="typing-row">
+          <div class="resp-avatar" style="background:${sk.bg};border-color:${sk.color}">${sk.initials}</div>
+          <div>
+            <div class="typing-name" style="color:${sk.color}">${sk.name} está redactando…</div>
+            <div class="dots">
+              <div class="dot" style="background:${sk.color}"></div>
+              <div class="dot" style="background:${sk.color}"></div>
+              <div class="dot" style="background:${sk.color}"></div>
+            </div>
+          </div>
+        </div>`;
+      })() : ''}
+    </div>
+  `).join('');
+
+  const feedContent = rounds.length === 0
+    ? `<div class="feed-empty">
+        <div class="feed-empty-icon">🏛️</div>
+        <div class="feed-empty-title">La Junta está en sesión</div>
+        <div class="feed-empty-sub">Plantea un tema y los tres funcionarios debatirán entre sí</div>
+       </div>`
+    : roundsHTML;
+
+  const chipsHTML = SUGGESTIONS.map(s =>
+    `<button class="chip" onclick="sendMesa('${s.replace(/'/g,"&#39;")}')">${s.length > 60 ? s.slice(0,60)+'…' : s}</button>`
+  ).join('');
+
+  const roundsBadge = rounds.length > 0
+    ? `<div class="rounds-badge">${rounds.length} ronda${rounds.length !== 1 ? 's' : ''}</div>`
+    : '';
+
+  return `
+    <div class="seats-grid">${seatsHTML}</div>
+    <div class="box">
+      <div class="box-header">
+        <div>
+          <div class="box-header-title">🔄 Sesión de Junta en Vivo</div>
+          <div class="box-header-sub">Cada funcionario responde y construye sobre la perspectiva anterior</div>
+        </div>
+        ${roundsBadge}
+      </div>
+      <div class="feed" id="feedArea">${feedContent}</div>
+      <div class="input-area">
+        <div class="chips">${chipsHTML}</div>
+        <div class="input-row">
+          <textarea id="mesaInput" rows="2"
+            placeholder="Plantea un tema a la Junta… (Enter = enviar, Shift+Enter = nueva línea)"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMesa()}"
+            ${isLoading ? 'disabled' : ''}></textarea>
+          <button class="send-btn" onclick="sendMesa()" ${isLoading ? 'disabled' : ''}>
+            ${isLoading ? 'En sesión…' : 'Debatir →'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderIndividual() {
+  const sk = selectedId ? STAKEHOLDERS.find(s => s.id === selectedId) : null;
+
+  const cardsHTML = STAKEHOLDERS.map(s => {
+    const exc = Math.floor(indConvs[s.id].length / 2);
+    const isSel = selectedId === s.id;
+    return `
+      <div class="seat-card" onclick="selectSk('${s.id}')"
+        style="border-color:${isSel ? s.color : '#1e293b'};
+               transform:${isSel ? 'translateY(-3px)' : 'none'};
+               box-shadow:${isSel ? `0 8px 28px ${s.color}30` : 'none'}">
+        <div class="seat-avatar" style="background:${s.bg};border-color:${s.color}">${s.initials}</div>
+        <div class="seat-name">${s.name}</div>
+        <div class="seat-role">${s.role}</div>
+        <div class="seat-tag" style="background:${s.tagBg};color:${s.tagColor}">${s.tag}</div>
+        ${exc > 0 ? `<div class="seat-badge" style="color:${s.color}">✓ ${exc} intercambio${exc!==1?'s':''}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  let chatHTML = '';
+  if (!sk) {
+    chatHTML = `
+      <div class="box">
+        <div class="empty-state">
+          <div class="empty-icon">👆</div>
+          <div class="empty-title">Selecciona un funcionario para iniciar</div>
+          <div class="empty-sub">Cada uno responderá desde su perspectiva institucional</div>
+        </div>
+      </div>`;
+  } else {
+    const conv = indConvs[sk.id];
+    const msgsHTML = conv.length === 0
+      ? `<div style="display:flex;align-items:center;justify-content:center;height:100%;text-align:center;">
+          <div>
+            <div style="font-size:28px;margin-bottom:8px">💬</div>
+            <div style="font-size:14px;color:#475569;font-weight:600">Presenta tu propuesta</div>
+            <div style="font-size:12px;color:#334155;margin-top:4px">Inicia el diálogo con ${sk.name.split(' ')[1]}</div>
+          </div>
+         </div>`
+      : conv.map(msg => {
+          if (msg.role === 'user') return `
+            <div class="msg-row user">
+              <div class="bubble user-msg">${msg.content.replace(/\n/g,'<br>')}</div>
+              <div class="msg-avatar-user">Tú</div>
+            </div>`;
+          return `
+            <div class="msg-row">
+              <div class="msg-avatar-ai" style="background:${sk.bg};border-color:${sk.color}">${sk.initials}</div>
+              <div class="bubble ai" style="border-color:${sk.color}25">${msg.content.replace(/\n/g,'<br>')}</div>
+            </div>`;
+        }).join('');
+
+    const typingHTML = indLoading ? `
+      <div class="msg-row">
+        <div class="msg-avatar-ai" style="background:${sk.bg};border-color:${sk.color}">${sk.initials}</div>
+        <div class="bubble ai" style="border-color:${sk.color}25;padding:12px 16px;">
+          <div class="dots">
+            <div class="dot" style="background:${sk.color}"></div>
+            <div class="dot" style="background:${sk.color}"></div>
+            <div class="dot" style="background:${sk.color}"></div>
+          </div>
+        </div>
+      </div>` : '';
+
+    const exc = Math.floor(conv.length / 2);
+    chatHTML = `
+      <div class="chat-box" style="border-color:${sk.color}40">
+        <div class="chat-header" style="background:linear-gradient(135deg,${sk.bg},${sk.bg}cc)">
+          <div class="chat-header-avatar">${sk.initials}</div>
+          <div>
+            <div class="chat-header-name">${sk.name}</div>
+            <div class="chat-header-role">${sk.role}</div>
+          </div>
+          <div class="chat-status">
+            <div class="status-dot"></div>
+            <span class="status-text">${exc} intercambio${exc!==1?'s':''}</span>
+          </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">${msgsHTML}${typingHTML}</div>
+        <div class="chat-input-area">
+          <textarea id="indInput" rows="2"
+            placeholder="Mensaje para ${sk.name}… (Enter = enviar)"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInd()}"
+            ${indLoading ? 'disabled' : ''}
+            style="border-color:#1e293b"
+            onfocus="this.style.borderColor='${sk.color}'"
+            onblur="this.style.borderColor='#1e293b'"></textarea>
+          <button class="send-btn" onclick="sendInd()"
+            style="background:${indLoading ? '#1e293b' : sk.color};color:${indLoading ? '#475569' : '#fff'}"
+            ${indLoading ? 'disabled' : ''}>
+            ${indLoading ? '…' : 'Enviar →'}
+          </button>
+        </div>
+      </div>`;
+  }
+
+  return `<div class="seats-grid">${cardsHTML}</div>${chatHTML}`;
+}
+
+function selectSk(id) {
+  selectedId = id;
+  render();
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
