@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IA-UniData — Iniciar Sesión</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: linear-gradient(160deg, #001530 0%, #002147 50%, #003166 100%);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #fff; border-radius: 24px; padding: 48px 44px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+  }
+  .logo-wrap { display: flex; align-items: center; gap: 14px; margin-bottom: 32px; }
+  .logo {
+    width: 48px; height: 48px; border-radius: 13px;
+    background: linear-gradient(135deg, #00a86b, #007a4d);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 900; color: #fff;
+    font-family: 'DM Serif Display', serif;
+    box-shadow: 0 4px 16px rgba(0,168,107,0.4);
+  }
+  .logo-text { font-size: 22px; font-weight: 700; color: #002147; }
+  .logo-sub { font-size: 11px; color: #7c6f5a; margin-top: 2px; letter-spacing: 0.04em; }
+  h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+  .sub { font-size: 13px; color: #6b5f4e; margin-bottom: 32px; line-height: 1.5; }
+  .field { margin-bottom: 16px; }
+  label { display: block; font-size: 12px; font-weight: 600; color: #002147; margin-bottom: 6px; letter-spacing: 0.03em; }
+  input {
+    width: 100%; padding: 12px 16px; border-radius: 10px;
+    border: 1.5px solid #ddd6c8; font-size: 14px; color: #1a1a2e;
+    font-family: inherit; outline: none; transition: border 0.15s;
+    background: #faf7f3;
+  }
+  input:focus { border-color: #002147; background: #fff; }
+  .error { font-size: 12px; color: #dc2626; margin-top: 6px; display: none; }
+  .btn {
+    width: 100%; padding: 13px; border-radius: 10px; border: none;
+    background: #002147; color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit; margin-top: 8px;
+    transition: all 0.2s; letter-spacing: 0.02em;
+  }
+  .btn:hover { background: #003166; transform: translateY(-1px); }
+  .divider { border: none; border-top: 1px solid #f0ebe3; margin: 24px 0; }
+  .demo-box {
+    background: #f0fdf7; border: 1px solid #a7f3d0; border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .demo-title { font-size: 11px; font-weight: 700; color: #065f46; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .demo-cred { font-size: 12px; color: #047857; line-height: 1.7; font-family: monospace; }
+  .demo-fill { font-size: 11px; color: #059669; margin-top: 8px; cursor: pointer; text-decoration: underline; }
+  .back { display: block; text-align: center; margin-top: 20px; font-size: 12px; color: #7c6f5a; text-decoration: none; }
+  .back:hover { color: #002147; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-wrap">
+    <div class="logo">U</div>
+    <div>
+      <div class="logo-text">IA-UniData</div>
+      <div class="logo-sub">Universidad de Puerto Rico · Río Piedras</div>
+    </div>
+  </div>
+ 
+  <h1>Iniciar sesión</h1>
+  <p class="sub">Accede con tus credenciales institucionales de la UPR para usar el asistente.</p>
+ 
+  <div class="field">
+    <label>Correo institucional</label>
+    <input type="email" id="email" placeholder="usuario@uprrp.edu" />
+  </div>
+  <div class="field">
+    <label>Contraseña</label>
+    <input type="password" id="password" placeholder="••••••••••" onkeydown="if(event.key==='Enter')login()" />
+    <div class="error" id="errorMsg">Credenciales incorrectas. Intenta de nuevo.</div>
+  </div>
+ 
+  <button class="btn" onclick="login()">Entrar →</button>
+ 
+  <hr class="divider"/>
+ 
+  <div class="demo-box">
+    <div class="demo-title">🔑 Credenciales de demo</div>
+    <div class="demo-cred">
+      Usuario: carmen.morales@uprrp.edu<br>
+      Contraseña: UniData2025
+    </div>
+    <div class="demo-fill" onclick="fillDemo()">Completar automáticamente →</div>
+  </div>
+ 
+  <a href="index.html" class="back">← Volver al inicio</a>
+</div>
+ 
+<script>
+  function fillDemo() {
+    document.getElementById('email').value = 'carmen.morales@uprrp.edu';
+    document.getElementById('password').value = 'UniData2025';
+  }
+ 
+  function login() {
+    const email = document.getElementById('email').value.trim();
+    const pass = document.getElementById('password').value;
+    const err = document.getElementById('errorMsg');
+ 
+    if (email === 'carmen.morales@uprrp.edu' && pass === 'UniData2025') {
+      localStorage.setItem('unidata_logged_in', 'true');
+      localStorage.setItem('unidata_user', 'Carmen Morales');
+      window.location.href = 'ia-unidata.html';
+    } else {
+      err.style.display = 'block';
+      document.getElementById('password').value = '';
+    }
+  }
+</script>
+</body>
+</html>
