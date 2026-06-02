@@ -90,7 +90,7 @@
   <div class="demo-box">
     <div class="demo-title">🔑 Credenciales de demo</div>
     <div class="demo-cred">
-      Usuario: carmen.morales@uprrp.edu<br>
+      Usuario: demo.user@uprrp.edu<br>
       Contraseña: UniData2025
     </div>
     <div class="demo-fill" onclick="fillDemo()">Completar automáticamente →</div>
@@ -101,7 +101,7 @@
  
 <script>
   function fillDemo() {
-    document.getElementById('email').value = 'carmen.morales@uprrp.edu';
+    document.getElementById('email').value = 'demo.user@uprrp.edu';
     document.getElementById('password').value = 'UniData2025';
   }
  
@@ -110,10 +110,10 @@
     const pass = document.getElementById('password').value;
     const err = document.getElementById('errorMsg');
  
-    if (email === 'carmen.morales@uprrp.edu' && pass === 'UniData2025') {
+    if (email === 'demo.user@uprrp.edu' && pass === 'UniData2025') {
       localStorage.setItem('unidata_logged_in', 'true');
-      localStorage.setItem('unidata_user', 'Carmen Morales');
-      window.location.href = 'ia-unidata.html';
+      localStorage.setItem('unidata_user', 'Demo User');
+      window.location.href = 'AI UniData.html';
     } else {
       err.style.display = 'block';
       document.getElementById('password').value = '';
