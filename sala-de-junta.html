@@ -258,7 +258,7 @@
 </div>
 <div class="main" id="mainContent"></div>
  -->*/
- /*
+ 
 // ── AUTH CHECK ──
 window.onload = function() {
   if (localStorage.getItem('unidata_logged_in') !== 'true') {
@@ -323,7 +323,8 @@ async function callGroq(system, userContent) {
     return "❌ Error de conexión con Groq. Verifica tu API Key.";
   }
 }
--->*/
+
+ 
  //StakeHolders 
 const STAKEHOLDERS = [
   {
@@ -384,7 +385,7 @@ function setMode(m) {
   document.getElementById('btnInd').className = 'mode-btn' + (m === 'individual' ? ' active' : '');
   render();
 }
- 
+ /*
 async function callClaude(system, messages) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -399,7 +400,7 @@ async function callClaude(system, messages) {
   const data = await res.json();
   return data.content?.find(b => b.type === 'text')?.text || 'Error al obtener respuesta.';
 }
-
+*/
  
  // Mesa Redonda
 async function sendMesa(override) {
