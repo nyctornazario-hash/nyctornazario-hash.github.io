@@ -233,6 +233,7 @@ window.onload = function() {
 function logout() {
   localStorage.removeItem('unidata_logged_in');
   localStorage.removeItem('unidata_user');
+  localStorage.removeItem('groq_api_key');
   window.location.href = 'Login Page.html';
 }
  
