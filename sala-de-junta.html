@@ -245,6 +245,66 @@
 <div class="main" id="mainContent"></div>
  
 <script>
+
+// ── CONFIGURACIÓN GROQ ──
+let GROQ_API_KEY = "";
+
+function saveApiKey() {
+  const keyInput = document.getElementById('groqKeyInput').value.trim();
+  if (keyInput.startsWith('gsk_')) {
+    GROQ_API_KEY = keyInput;
+    localStorage.setItem('groq_api_key', keyInput);
+    alert("✅ API Key de Groq guardada correctamente");
+  } else {
+    alert("❌ Por favor pega una clave válida de Groq (debe empezar con gsk_)");
+  }
+}
+
+// Cargar la key guardada al iniciar
+window.onload = function() {
+  const savedKey = localStorage.getItem('groq_api_key');
+  if (savedKey) {
+    GROQ_API_KEY = savedKey;
+    const keyField = document.getElementById('groqKeyInput');
+    if (keyField) keyField.value = savedKey;
+  }
+};
+
+// ── LLAMADA A GROQ ──
+async function callGroq(system, userContent) {
+  if (!GROQ_API_KEY) {
+    return "⚠️ Por favor configura tu API Key de Groq para activar la Sala de Junta.";
+  }
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        max_tokens: 900,
+        temperature: 0.72,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: userContent }
+        ]
+      })
+    });
+
+    if (!res.ok) throw new Error("API Error");
+    const data = await res.json();
+    return data.choices[0].message.content;
+
+  } catch (error) {
+    console.error(error);
+    return "❌ Error de conexión con Groq. Verifica tu API Key.";
+  }
+}
+
+ //StakeHolders 
 const STAKEHOLDERS = [
   {
     id: 'rector',
@@ -319,62 +379,61 @@ async function callClaude(system, messages) {
   const data = await res.json();
   return data.content?.find(b => b.type === 'text')?.text || 'Error al obtener respuesta.';
 }
+
  
+ // Mesa Redonda
 async function sendMesa(override) {
   const input = document.getElementById('mesaInput');
   const q = (override || input?.value || '').trim();
   if (!q || isLoading) return;
   if (input) input.value = '';
+
   isLoading = true;
- 
   const roundIdx = rounds.length;
   rounds.push({ question: q, responses: [], typing: null });
   render();
- 
+
   let prevResponse = '';
- 
+
   for (const sk of STAKEHOLDERS) {
     rounds[roundIdx].typing = sk.id;
     render();
- 
+
     const userMsg = prevResponse
       ? `Tema: "${q}"\n\nEl funcionario anterior expresó: "${prevResponse}"\n\nComparte tu perspectiva institucional, construyendo sobre lo dicho.`
       : `El equipo de UniData UPR presenta: "${q}". Ofrece tu análisis institucional.`;
- 
-    try {
-      const reply = await callClaude(sk.system, [{ role: 'user', content: userMsg }]);
-      rounds[roundIdx].responses.push({ sk, text: reply });
-      prevResponse = reply;
-    } catch {
-      rounds[roundIdx].responses.push({ sk, text: 'Error de conexión.' });
-    }
- 
+
+    const reply = await callGroq(sk.system, userMsg);
+
+    rounds[roundIdx].responses.push({ sk, text: reply });
+    prevResponse = reply;
+
     rounds[roundIdx].typing = null;
     render();
   }
- 
+
   isLoading = false;
   render();
 }
+
  
+ //Modo Individual-- 
 async function sendInd() {
   const input = document.getElementById('indInput');
   const q = input?.value.trim();
   if (!q || !selectedId || indLoading) return;
+
   input.value = '';
   indLoading = true;
- 
   const sk = STAKEHOLDERS.find(s => s.id === selectedId);
+
   indConvs[selectedId].push({ role: 'user', content: q });
   render();
- 
-  try {
-    const reply = await callClaude(sk.system, indConvs[selectedId]);
-    indConvs[selectedId].push({ role: 'assistant', content: reply });
-  } catch {
-    indConvs[selectedId].push({ role: 'assistant', content: 'Error de conexión.' });
-  }
- 
+
+  const reply = await callGroq(sk.system, q);
+
+  indConvs[selectedId].push({ role: 'assistant', content: reply });
+
   indLoading = false;
   render();
   scrollToBottom('chatMessages');
