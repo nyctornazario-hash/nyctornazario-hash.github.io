@@ -319,7 +319,26 @@ async function processMsg(q) {
         })
       }
     );
+// Intento 4 de que funcione
+// ── SEND ──
+function ask(q) {
+  document.getElementById('optionsWrap').style.display = 'none';
+  processMsg(q);
+}
 
+function sendMsg() {
+  const inp = document.getElementById('userInput');
+  const q = inp.value.trim();
+
+  if (!q) return;
+
+  inp.value = '';
+
+  document.getElementById('optionsWrap').style.display = 'none';
+
+  processMsg(q);
+}
+    
     const data = await response.json();
     hideTyping();
     if (data.error) {
