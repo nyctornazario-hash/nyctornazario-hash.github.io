@@ -28,6 +28,17 @@
   .sys-chip { display:flex; align-items:center; gap:5px; font-size:10px; color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:3px 10px; }
   .sys-dot { width:5px; height:5px; border-radius:50%; background:var(--green); }
  
+  /* API KEY BANNER */
+  .api-banner { background:#fff8e6; border-bottom:1px solid #f0d070; padding:10px 24px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .api-banner label { font-size:12px; font-weight:600; color:#5a4000; white-space:nowrap; }
+  .api-banner input { flex:1; min-width:200px; max-width:380px; padding:7px 12px; border-radius:8px; border:1px solid #d0b040; font-size:12px; font-family:monospace; outline:none; background:#fffdf0; }
+  .api-banner input:focus { border-color:#002147; }
+  .api-save-btn { padding:7px 16px; border-radius:8px; border:none; background:#002147; color:#fff; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; white-space:nowrap; }
+  .api-save-btn:hover { background:#003166; }
+  .api-status { font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; }
+  .api-status.ok { background:#d1fae5; color:#065f46; }
+  .api-status.none { background:#fef3c7; color:#92400e; }
+ 
   .main { max-width:900px; width:100%; margin:0 auto; padding:20px 18px 40px; flex:1; display:flex; flex-direction:column; gap:16px; }
  
   .tabs { display:flex; gap:4px; background:#e8e0d4; border-radius:12px; padding:4px; }
@@ -44,7 +55,7 @@
   .user-online { margin-left:auto; display:flex; align-items:center; gap:5px; font-size:10px; color:var(--muted); }
   .online-dot { width:7px; height:7px; border-radius:50%; background:var(--green); }
  
-  .messages { min-height:280px; max-height:400px; overflow-y:auto; padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
+  .messages { min-height:280px; max-height:420px; overflow-y:auto; padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
   .msg-row { display:flex; gap:10px; align-items:flex-start; }
   .msg-row.user { justify-content:flex-end; }
   .msg-ai { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--navy-dark),var(--navy-mid)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; color:#fff; font-family:'DM Serif Display',serif; flex-shrink:0; margin-top:2px; }
@@ -76,7 +87,6 @@
   .send-btn { padding:10px 20px; border-radius:10px; border:none; font-size:13px; font-weight:700; cursor:pointer; background:var(--navy); color:#fff; font-family:inherit; transition:all 0.2s; white-space:nowrap; }
   .send-btn:hover { background:var(--navy-mid); }
  
-  /* FAQ */
   #faqPanel { background:#fff; border-radius:16px; border:1px solid #ddd6c8; padding:28px; }
   .panel-title { font-size:18px; font-weight:700; color:var(--navy); margin-bottom:6px; }
   .panel-sub { font-size:13px; color:var(--muted); margin-bottom:22px; }
@@ -88,7 +98,6 @@
   .faq-item.open .faq-arr { transform:rotate(180deg); }
   .faq-item.open .faq-a { display:block; }
  
-  /* CONTACT */
   #contactPanel { background:#fff; border-radius:16px; border:1px solid #ddd6c8; padding:28px; }
   .contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
   .contact-card { background:var(--cream); border-radius:12px; padding:16px; border:1px solid #ddd6c8; }
@@ -103,6 +112,7 @@
 </head>
 <body>
  
+<!-- NAV -->
 <div class="topnav">
   <a href="index.html" class="back-link">← Inicio</a>
   <div style="display:flex;gap:8px;align-items:center">
@@ -111,6 +121,7 @@
   </div>
 </div>
  
+<!-- HEADER -->
 <div class="app-header">
   <div class="header-brand">
     <div class="header-logo">U</div>
@@ -127,16 +138,13 @@
     <div class="sys-chip"><div class="sys-dot"></div>Banner ERP</div>
   </div>
 </div>
-
-<!-- === CAMPO PARA LA API KEY === -->
-<div style="background:#f0e9d8; padding:10px 20px; text-align:center; border-bottom:1px solid #ddd6c8; font-size:12px;">
-  <strong>API Key de Groq:</strong><br>
-  <input type="password" id="groqKeyInput" placeholder="Pega aquí tu clave gsk_..." 
-         style="width:380px; max-width:90%; padding:8px 12px; margin:8px 0; border-radius:8px; border:1px solid #bbb;">
-  <button onclick="saveApiKey()" 
-          style="padding:8px 16px; background:#002147; color:white; border:none; border-radius:8px; cursor:pointer;">
-    Guardar Key
-  </button>
+ 
+<!-- API KEY BANNER -->
+<div class="api-banner">
+  <label>🔑 API Key de Groq:</label>
+  <input type="password" id="groqKeyInput" placeholder="gsk_... (opcional — activa IA avanzada para preguntas fuera de la base de datos)"/>
+  <button class="api-save-btn" onclick="saveApiKey()">Guardar</button>
+  <span class="api-status none" id="apiStatus">Sin key — modo local activo</span>
 </div>
  
 <div class="main">
@@ -149,28 +157,45 @@
   <!-- CHAT -->
   <div class="panel visible" id="chatPanel">
     <div class="user-badge">
-      <div class="user-avatar" id="userInitials">DU</div>
+      <div class="user-avatar" id="userInitials">CM</div>
       <div>
-        <div class="user-name" id="userName">Demo User</div>
+        <div class="user-name" id="userName">Carmen Morales</div>
         <div class="user-dept">Oficina de Registraduría · UPR Río Piedras</div>
       </div>
       <div class="user-online"><div class="online-dot"></div>En línea</div>
     </div>
+ 
     <div class="messages" id="messages"></div>
+ 
     <div id="optionsWrap">
       <div class="opt-label">¿En qué te puedo ayudar hoy?</div>
       <div class="opts-grid">
-        <button class="opt-btn" onclick="ask('¿Cuántos estudiantes tiene la UPR Río Piedras actualmente?')"><div class="opt-icon">📊</div><div><span class="opt-t">Datos de matrícula</span><span class="opt-s">Estadísticas institucionales</span></div></button>
-        <button class="opt-btn" onclick="ask('¿Cuántos candidatos a graduación hay este semestre?')"><div class="opt-icon">🎓</div><div><span class="opt-t">Candidatos a graduación</span><span class="opt-s">Elegibilidad y requisitos</span></div></button>
-        <button class="opt-btn" onclick="ask('Tengo una consulta sobre FERPA y privacidad de expedientes')"><div class="opt-icon">🔒</div><div><span class="opt-t">FERPA y privacidad</span><span class="opt-s">Cumplimiento normativo</span></div></button>
-        <button class="opt-btn" onclick="ask('¿Cuál es el estado del traslado del estudiante García Pérez?')"><div class="opt-icon">🔄</div><div><span class="opt-t">Seguimiento de trámites</span><span class="opt-s">Traslados y solicitudes</span></div></button>
-        <button class="opt-btn" onclick="ask('¿Cuáles son las fechas importantes del semestre?')"><div class="opt-icon">📅</div><div><span class="opt-t">Calendario académico</span><span class="opt-s">Fechas y plazos</span></div></button>
-        <button class="opt-btn" onclick="ask('¿Cuánto cuesta el crédito en la UPR?')"><div class="opt-icon">💰</div><div><span class="opt-t">Costos y aranceles</span><span class="opt-s">Matrícula y pagos</span></div></button>
+        <button class="opt-btn" onclick="ask('¿Cuántos estudiantes tiene la UPR Río Piedras actualmente?')">
+          <div class="opt-icon">📊</div><div><span class="opt-t">Datos de matrícula</span><span class="opt-s">Estadísticas institucionales</span></div>
+        </button>
+        <button class="opt-btn" onclick="ask('¿Cuántos candidatos a graduación hay este semestre?')">
+          <div class="opt-icon">🎓</div><div><span class="opt-t">Candidatos a graduación</span><span class="opt-s">Elegibilidad y requisitos</span></div>
+        </button>
+        <button class="opt-btn" onclick="ask('Tengo una consulta sobre FERPA y privacidad de expedientes')">
+          <div class="opt-icon">🔒</div><div><span class="opt-t">FERPA y privacidad</span><span class="opt-s">Cumplimiento normativo</span></div>
+        </button>
+        <button class="opt-btn" onclick="ask('¿Cuál es el estado del traslado del estudiante García Pérez?')">
+          <div class="opt-icon">🔄</div><div><span class="opt-t">Seguimiento de trámites</span><span class="opt-s">Traslados y solicitudes</span></div>
+        </button>
+        <button class="opt-btn" onclick="ask('¿Cuáles son las fechas importantes del semestre?')">
+          <div class="opt-icon">📅</div><div><span class="opt-t">Calendario académico</span><span class="opt-s">Fechas y plazos</span></div>
+        </button>
+        <button class="opt-btn" onclick="ask('¿Cuánto cuesta el crédito en la UPR?')">
+          <div class="opt-icon">💰</div><div><span class="opt-t">Costos y aranceles</span><span class="opt-s">Matrícula y pagos</span></div>
+        </button>
       </div>
     </div>
+ 
     <div class="input-area">
-      <textarea id="userInput" rows="2" placeholder="Escríbeme tu consulta… (Enter = enviar, Shift+Enter = nueva línea)"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+      <textarea id="userInput" rows="2"
+        placeholder="Escríbeme tu consulta… (Enter = enviar, Shift+Enter = nueva línea)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}">
+      </textarea>
       <button class="send-btn" onclick="sendMsg()">Enviar →</button>
     </div>
   </div>
@@ -198,269 +223,295 @@
 </div>
  
 <script>
-
-// ── CONFIGURACIÓN GROQ ──
-let GROQ_API_KEY = "";
-
-function saveApiKey() {
-  const keyInput = document.getElementById('groqKeyInput').value.trim();
-  if (keyInput.startsWith('gsk_')) {
-    GROQ_API_KEY = keyInput;
-    localStorage.setItem('groq_api_key', keyInput);
-    alert("✅ API Key guardada correctamente");
-  } else {
-    alert("❌ Pega una clave válida de Groq (empieza con gsk_)");
-  }
-}
+// ════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════
+var groqApiKey = '';
+var isLoading = false;
  
-// ── AUTH CHECK ──
+// ════════════════════════════════════
+// INICIO
+// ════════════════════════════════════
 window.onload = function() {
+  // Verificar login
   if (localStorage.getItem('unidata_logged_in') !== 'true') {
-    window.location.href = 'Login Page.html';
+    window.location.href = 'login.html';
     return;
   }
-
-  const savedKey = localStorage.getItem('groq_api_key');
+ 
+  // Cargar API key guardada
+  var savedKey = localStorage.getItem('groq_api_key');
   if (savedKey) {
-    GROQ_API_KEY = savedKey;
+    groqApiKey = savedKey;
     document.getElementById('groqKeyInput').value = savedKey;
+    document.getElementById('apiStatus').textContent = '✅ Key de Groq activa';
+    document.getElementById('apiStatus').className = 'api-status ok';
   }
-
+ 
   buildFAQ();
-  addMsg('ai', '¡Buenos días, DemoUser! 👋 Soy <strong>IA-UniData</strong>.\n\nPega tu API Key de Groq para activar la IA avanzada. Mientras tanto, puedes usar las consultas rápidas.');
+ 
+  addMsg('ai', '¡Buenos días! 👋 Soy <strong>IA-UniData</strong>, el asistente institucional de la UPR Río Piedras.<br><br>Tengo acceso a datos de matrícula 2024-2025, regulaciones FERPA, calendario académico, costos y directorio de oficinas. Selecciona una categoría o escríbeme directamente.');
 };
  
+// ════════════════════════════════════
+// API KEY
+// ════════════════════════════════════
+function saveApiKey() {
+  var keyVal = document.getElementById('groqKeyInput').value.trim();
+  if (!keyVal) {
+    alert('Por favor pega tu API key de Groq primero.');
+    return;
+  }
+  if (!keyVal.startsWith('gsk_')) {
+    alert('La key de Groq debe empezar con "gsk_". Verifica que la copiaste correctamente.');
+    return;
+  }
+  groqApiKey = keyVal;
+  localStorage.setItem('groq_api_key', keyVal);
+  document.getElementById('apiStatus').textContent = '✅ Key de Groq activa';
+  document.getElementById('apiStatus').className = 'api-status ok';
+  alert('✅ API Key guardada. Ahora puedes hacer preguntas avanzadas.');
+}
+ 
+// ════════════════════════════════════
+// LOGOUT
+// ════════════════════════════════════
 function logout() {
   localStorage.removeItem('unidata_logged_in');
   localStorage.removeItem('unidata_user');
   localStorage.removeItem('groq_api_key');
-  window.location.href = 'Login Page.html';
+  window.location.href = 'login.html';
 }
  
-// ── TABS ──
+// ════════════════════════════════════
+// TABS
+// ════════════════════════════════════
 function setTab(t) {
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['chat','faq','contact'][i]===t));
-  document.getElementById('chatPanel').classList.toggle('visible', t==='chat');
-  document.getElementById('chatPanel').style.display = t==='chat' ? 'flex' : 'none';
-  document.getElementById('faqPanel').style.display = t==='faq' ? 'block' : 'none';
-  document.getElementById('contactPanel').style.display = t==='contact' ? 'block' : 'none';
+  var tabs = document.querySelectorAll('.tab');
+  var names = ['chat', 'faq', 'contact'];
+  tabs.forEach(function(el, i) {
+    el.classList.toggle('active', names[i] === t);
+  });
+  document.getElementById('chatPanel').style.display = t === 'chat' ? 'flex' : 'none';
+  document.getElementById('chatPanel').classList.toggle('visible', t === 'chat');
+  document.getElementById('faqPanel').style.display = t === 'faq' ? 'block' : 'none';
+  document.getElementById('contactPanel').style.display = t === 'contact' ? 'block' : 'none';
 }
  
-// ── MESSAGES ──
+// ════════════════════════════════════
+// MENSAJES
+// ════════════════════════════════════
 function addMsg(role, html) {
-  const box = document.getElementById('messages');
-  const row = document.createElement('div');
-  row.className = 'msg-row' + (role==='user'?' user':'');
-  const content = html.replace(/\n/g,'<br>');
-  if (role==='ai') {
-    row.innerHTML = `<div class="msg-ai">U</div><div class="bubble ai">${content}</div>`;
+  var box = document.getElementById('messages');
+  var row = document.createElement('div');
+  row.className = 'msg-row' + (role === 'user' ? ' user' : '');
+  var content = html.replace(/\n/g, '<br>');
+  if (role === 'ai') {
+    row.innerHTML = '<div class="msg-ai">U</div><div class="bubble ai">' + content + '</div>';
   } else {
-    row.innerHTML = `<div class="bubble usr">${content}</div><div class="msg-user-av">DU</div>`;
+    row.innerHTML = '<div class="bubble usr">' + content + '</div><div class="msg-user-av">CM</div>';
   }
   box.appendChild(row);
   box.scrollTop = box.scrollHeight;
 }
  
 function showTyping() {
-  const box = document.getElementById('messages');
-  const t = document.createElement('div');
-  t.className='typing-row'; t.id='typing';
-  t.innerHTML=`<div class="msg-ai">U</div><div class="typing-bub"><span class="typing-lbl">Consultando sistemas</span><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
-  box.appendChild(t); box.scrollTop=box.scrollHeight;
+  var box = document.getElementById('messages');
+  var t = document.createElement('div');
+  t.className = 'typing-row';
+  t.id = 'typingIndicator';
+  t.innerHTML = '<div class="msg-ai">U</div><div class="typing-bub"><span class="typing-lbl">Consultando sistemas</span><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  box.appendChild(t);
+  box.scrollTop = box.scrollHeight;
 }
-function hideTyping(){ const t=document.getElementById('typing'); if(t)t.remove(); }
-
-
-
-async function processMsg(q) {
-  addMsg('user', q);
-  showTyping();
-  try {
-
-    // Buscar primero en la base local
-    const localAnswer = getResponse(q);
-    if (localAnswer !== NO_INFO) {
-      hideTyping();
-      addMsg('ai', localAnswer);
-      return;
-    }
-
-    // Si no hay API Key
-    if (!GROQ_API_KEY) {
-      hideTyping();
-      addMsg('ai', '⚠️ Guarda primero una API Key de Groq.');
-      return;
-    }
-
-    // Consulta a Groq
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${GROQ_API_KEY}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "system",
-              content:
-                "Eres IA-UniData, un asistente institucional de la Universidad de Puerto Rico. Responde en español de forma profesional."
-            },
-            {
-              role: "user",
-              content: q
-            }
-          ],
-          temperature: 0.3,
-          max_tokens: 800
-        })
-      }
-    );
-// Intento 4 de que funcione
-// ── SEND ──
+ 
+function hideTyping() {
+  var t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+ 
+// ════════════════════════════════════
+// ENVIAR MENSAJE
+// ════════════════════════════════════
 function ask(q) {
   document.getElementById('optionsWrap').style.display = 'none';
   processMsg(q);
 }
-
+ 
 function sendMsg() {
-  const inp = document.getElementById('userInput');
-  const q = inp.value.trim();
-
-  if (!q) return;
-
+  var inp = document.getElementById('userInput');
+  var q = inp.value.trim();
+  if (!q || isLoading) return;
   inp.value = '';
-
   document.getElementById('optionsWrap').style.display = 'none';
-
-  processMsg(q);
-}
-    
-    const data = await response.json();
-    hideTyping();
-    if (data.error) {
-      addMsg('ai', '❌ ' + data.error.message);
-      return;
-    }
-    addMsg(
-      'ai',
-      data.choices[0].message.content
-    );
-  } catch (error) {
-    hideTyping();
-    addMsg(
-      'ai',
-      '❌ Error conectando con Groq: ' + error.message
-    );
-  }
-}
-
-  
-/*// ── SEND ──
-function ask(q){ document.getElementById('optionsWrap').style.display='none'; processMsg(q); }
-function sendMsg(){
-  const inp=document.getElementById('userInput');
-  const q=inp.value.trim(); if(!q)return;
-  inp.value='';
-  document.getElementById('optionsWrap').style.display='none';
   processMsg(q);
 }
  
 function processMsg(q) {
   addMsg('user', q);
   showTyping();
-  setTimeout(()=>{ hideTyping(); addMsg('ai', getResponse(q)); }, 900 + Math.random()*600);
+  isLoading = true;
+ 
+  // Primero buscar en la base de datos local
+  var localAnswer = getResponse(q);
+  if (localAnswer !== NO_INFO) {
+    setTimeout(function() {
+      hideTyping();
+      addMsg('ai', localAnswer);
+      isLoading = false;
+    }, 700 + Math.random() * 500);
+    return;
+  }
+ 
+  // Si no hay respuesta local, intentar con Groq
+  if (groqApiKey) {
+    callGroq(q);
+  } else {
+    setTimeout(function() {
+      hideTyping();
+      addMsg('ai', NO_INFO);
+      isLoading = false;
+    }, 700);
+  }
 }
- */
-// ── KNOWLEDGE BASE ──
-const KB = {
+ 
+// ════════════════════════════════════
+// GROQ API
+// ════════════════════════════════════
+async function callGroq(q) {
+  try {
+    var response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + groqApiKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          {
+            role: 'system',
+            content: 'Eres IA-UniData, el asistente institucional de la Universidad de Puerto Rico (UPR) Río Piedras. Responde siempre en español de Puerto Rico, con tono profesional y conciso. Si no tienes información suficiente sobre algo muy específico de la UPR, indícalo claramente y sugiere contactar la oficina correspondiente.'
+          },
+          {
+            role: 'user',
+            content: q
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 800
+      })
+    });
+ 
+    var data = await response.json();
+    hideTyping();
+    isLoading = false;
+ 
+    if (data.error) {
+      addMsg('ai', '❌ Error de API: ' + data.error.message + '<br><br>Verifica que tu key de Groq sea válida.');
+      return;
+    }
+    addMsg('ai', data.choices[0].message.content);
+ 
+  } catch (err) {
+    hideTyping();
+    isLoading = false;
+    addMsg('ai', '❌ No se pudo conectar con Groq: ' + err.message + '<br><br>Verifica tu conexión a internet y que la key sea correcta.');
+  }
+}
+ 
+// ════════════════════════════════════
+// BASE DE CONOCIMIENTO LOCAL
+// ════════════════════════════════════
+var KB = {
   matricula: {
     keys: ['matrícula','matricula','estudiantes','enrollment','cuántos','cuantos','total','población','poblacion','inscritos'],
-    reply: `📊 <strong>Datos de Matrícula — UPR Río Piedras (2024-2025)</strong>\n\n<strong>Total general: 11,312 estudiantes</strong>\n• Subgraduados: 8,710 | Graduados: 2,602\n• Hombres: 4,380 (39%) | Mujeres: 6,932 (61%)\n\n<strong>Subgraduados por género:</strong>\n• Hombres: 3,273 | Mujeres: 5,437\n\n<strong>Graduados por género:</strong>\n• Hombres: 1,107 | Mujeres: 1,495\n\n<strong>Por etnicidad (total):</strong>\n• Hispanos: 9,648 (85.3%) | Negros: 432 | Blancos: 258 | Asiáticos: 14\n\n📌 Fuente: IPEDS / CollegeTuitionCompare 2024-2025\n\n¿Deseas datos específicos por facultad o programa?`
+    reply: '📊 <strong>Datos de Matrícula — UPR Río Piedras (2024-2025)</strong>\n\n<strong>Total general: 11,312 estudiantes</strong>\n• Subgraduados: 8,710 | Graduados: 2,602\n• Hombres: 4,380 (39%) | Mujeres: 6,932 (61%)\n\n<strong>Subgraduados por género:</strong>\n• Hombres: 3,273 | Mujeres: 5,437\n\n<strong>Graduados por género:</strong>\n• Hombres: 1,107 | Mujeres: 1,495\n\n<strong>Por etnicidad:</strong>\n• Hispanos: 9,648 (85.3%) | Negros: 432 | Blancos: 258 | Asiáticos: 14\n\n📌 Fuente: IPEDS / CollegeTuitionCompare 2024-2025\n\n¿Deseas datos específicos por facultad o programa?'
   },
   femeninas: {
     keys: ['femenina','femeninas','mujeres','mujer','femeni','female','género femenino'],
-    reply: `👩 <strong>Estudiantes Femeninas — UPR Río Piedras (2024-2025)</strong>\n\n<strong>Total mujeres: 6,932 (61% del total)</strong>\n\n• Subgraduadas: 5,437\n• Graduadas: 1,495\n\n<strong>Por facultad (estimado):</strong>\n• Adm. de Empresas: 1,147 mujeres (1er año: 307)\n• Ciencias Sociales: 1,002 mujeres\n• Humanidades: 847 mujeres\n• Educación: 621 mujeres\n• Ciencias Naturales: 612 mujeres\n\n📌 Fuente: IPEDS 2024-2025\n\n¿Necesitas estos datos desglosados por programa específico?`
+    reply: '👩 <strong>Estudiantes Femeninas — UPR Río Piedras (2024-2025)</strong>\n\n<strong>Total mujeres: 6,932 (61% del total)</strong>\n• Subgraduadas: 5,437\n• Graduadas: 1,495\n\n<strong>Por facultad (estimado):</strong>\n• Adm. de Empresas: 1,147 mujeres (1er año: 307)\n• Ciencias Sociales: 1,002 mujeres\n• Humanidades: 847 mujeres\n• Educación: 621 mujeres\n• Ciencias Naturales: 612 mujeres\n\n📌 Fuente: IPEDS 2024-2025\n\n¿Necesitas estos datos desglosados por programa específico?'
   },
   adm_empresas: {
-    keys: ['administración de empresas','administracion de empresas','business','contabilidad','mercadeo','gerencia','finanzas empresas','adm. de empresas'],
-    reply: `🏢 <strong>Facultad de Administración de Empresas — UPR Río Piedras</strong>\n\n<strong>Matrícula total: 1,847 estudiantes</strong>\n• 1er año: 524 (307 mujeres, 217 hombres)\n• 2do año: 489 | 3er año: 461 | 4to año: 373\n\n<strong>Concentraciones activas:</strong>\n• Contabilidad: 412 | Mercadeo: 387 | Gerencia: 356\n• Finanzas: 298 | Sistemas de Información: 394\n\n<strong>Candidatos a graduación mayo 2025: 187</strong>\n• Aprobados: 164 | Pendientes verificación: 18 | Con deficiencias: 5\n\n¿Deseas información de un estudiante o trámite específico de esta facultad?`
+    keys: ['administración de empresas','administracion de empresas','business','contabilidad','mercadeo','gerencia','adm. de empresas'],
+    reply: '🏢 <strong>Facultad de Administración de Empresas — UPR Río Piedras</strong>\n\n<strong>Matrícula total: 1,847 estudiantes</strong>\n• 1er año: 524 (307 mujeres, 217 hombres)\n• 2do año: 489 | 3er año: 461 | 4to año: 373\n\n<strong>Concentraciones activas:</strong>\n• Contabilidad: 412 | Mercadeo: 387 | Gerencia: 356\n• Finanzas: 298 | Sistemas de Información: 394\n\n<strong>Candidatos a graduación mayo 2025: 187</strong>\n• Aprobados: 164 | Pendientes: 18 | Con deficiencias: 5\n\n¿Deseas información sobre un estudiante o trámite específico?'
   },
   graduacion: {
-    keys: ['graduación','graduacion','candidatos','graduar','commencement','grados','diploma','conferred'],
-    reply: `🎓 <strong>Candidatos a Graduación — Mayo 2025</strong>\n\n<strong>Total candidatos: 1,043</strong>\n• ✅ Aprobados: 953\n• ⏳ Pendientes verificación de requisitos: 67\n• ⚠️ Con deficiencias activas: 23\n\n<strong>Por facultad:</strong>\n• Adm. de Empresas: 187 | Ciencias Sociales: 156\n• Humanidades: 134 | Ciencias Naturales: 121\n• Educación: 98 | Derecho: 89 | Comunicación: 76 | Arquitectura: 67 | Otros: 115\n\n📅 Ceremonia de graduación: <strong>24 de mayo de 2025</strong>\n📍 Coliseo Rafael A. Mangual, UPR Río Piedras\n\n¿Necesitas verificar el estatus de un candidato específico?`
+    keys: ['graduación','graduacion','candidatos','graduar','commencement','diploma'],
+    reply: '🎓 <strong>Candidatos a Graduación — Mayo 2025</strong>\n\n<strong>Total: 1,043 candidatos</strong>\n• ✅ Aprobados: 953\n• ⏳ Pendientes verificación: 67\n• ⚠️ Con deficiencias: 23\n\n<strong>Por facultad:</strong>\n• Adm. de Empresas: 187 | Ciencias Sociales: 156\n• Humanidades: 134 | Ciencias Naturales: 121\n• Educación: 98 | Derecho: 89 | Comunicación: 76\n\n📅 Ceremonia: <strong>24 de mayo de 2025</strong>\n📍 Coliseo Rafael A. Mangual, UPR Río Piedras\n\n¿Necesitas verificar el estatus de un candidato?'
   },
   traslado: {
-    keys: ['traslado','transfer','cambio de recinto','trasladar','caso reg'],
-    reply: `🔄 <strong>Traslados Interdepartamentales — Estado Actual</strong>\n\n📋 <strong>Traslados pendientes activos: 34</strong>\n• En revisión Registraduría: 12\n• Pendientes aprobación Decanato: 15\n• En espera documentación del estudiante: 7\n\n<strong>Caso específico — #REG-2025-4471:</strong>\n👤 García Pérez, José M. | Bayamón → Río Piedras\n⏳ Estado: Pendiente aprobación Decanato Académico\n📅 Sometido: 14 de marzo de 2025\n🔔 Último movimiento: En revisión desde 28 de marzo\n📌 Próximo paso: Aprobación del Decano Asociado (estimado 5-7 días hábiles)\n\n¿Deseas que le envíe una notificación automática al estudiante o al Decanato?`
+    keys: ['traslado','transfer','cambio de recinto','trasladar','garcía pérez','garcia perez','reg-2025'],
+    reply: '🔄 <strong>Traslados — Estado Actual</strong>\n\n📋 <strong>Pendientes activos: 34</strong>\n• En revisión Registraduría: 12\n• Pendientes aprobación Decanato: 15\n• En espera documentación: 7\n\n<strong>Caso #REG-2025-4471:</strong>\n👤 García Pérez, José M. | Bayamón → Río Piedras\n⏳ Estado: Pendiente aprobación Decanato Académico\n📅 Sometido: 14 de marzo de 2025\n📌 Próximo paso: Aprobación Decano Asociado (5-7 días hábiles)\n\n¿Deseas enviar una notificación a la oficina correspondiente?'
   },
   concentracion: {
-    keys: ['concentración','concentracion','cambio de programa','cambio de concentración','major','cambio de major'],
-    reply: `📋 <strong>Cambios de Concentración — Proceso Actual</strong>\n\n<strong>Solicitudes activas: 28</strong>\n• Aprobadas este semestre: 15\n• En revisión: 9 | Pendientes documentación: 4\n\n<strong>Caso reciente — #REG-2025-3892:</strong>\n👤 Martínez Rivera, Ana L. | Contabilidad → Mercadeo\n✅ Estado: Aprobado (22 de marzo de 2025)\n📌 Próximo paso: Estudiante debe reportarse a Consejería Académica\n\n<strong>Formulario requerido para cambio de concentración:</strong>\n📄 Formulario RP-301 — disponible en Registraduría o en uprp.edu/formularios\nRequisitos: Índice mínimo 2.00, sin deficiencias académicas activas, firma del consejero\n\n¿Necesitas información sobre otro caso o el proceso completo?`
+    keys: ['concentración','concentracion','cambio de programa','cambio de concentración','major'],
+    reply: '📋 <strong>Cambios de Concentración — Proceso Actual</strong>\n\n<strong>Solicitudes activas: 28</strong>\n• Aprobadas: 15 | En revisión: 9 | Pendientes documentación: 4\n\n<strong>Caso #REG-2025-3892:</strong>\n👤 Martínez Rivera, Ana L. | Contabilidad → Mercadeo\n✅ Aprobado el 22 de marzo de 2025\n📌 Próximo paso: Reportarse a Consejería Académica\n\n<strong>Formulario requerido:</strong> RP-301\n📄 Disponible en Registraduría o uprp.edu/formularios\nRequisitos: Índice mínimo 2.00, sin deficiencias activas\n\n¿Necesitas información sobre otro caso?'
   },
   ferpa: {
-    keys: ['ferpa','privacidad','expediente','confidencial','divulgar','información personal','privacy','student privacy','expedientes académicos'],
-    reply: `🔒 <strong>FERPA — Family Educational Rights and Privacy Act</strong>\n\n<strong>¿Qué es?</strong> Ley federal (20 U.S.C. §1232g) que protege la privacidad de los expedientes educativos de estudiantes en instituciones que reciben fondos federales como la UPR.\n\n<strong>Información que SÍ puede divulgarse sin consentimiento (Directorio):</strong>\n✅ Nombre del estudiante\n✅ Programa de estudios\n✅ Fechas de asistencia\n✅ Grados obtenidos\n✅ Actividades extracurriculares\n\n<strong>Información que NO puede divulgarse sin consentimiento escrito:</strong>\n❌ Calificaciones y notas\n❌ Número de Seguro Social\n❌ Expediente académico completo\n❌ Información financiera\n❌ Información disciplinaria\n\n<strong>Excepciones FERPA (sin consentimiento del estudiante):</strong>\n• Funcionarios con interés educativo legítimo\n• Instituciones receptoras de traslado\n• Autoridades judiciales con orden judicial\n• Emergencias de salud o seguridad\n• Padres de estudiantes fiscalmente dependientes\n\n<strong>Derechos del estudiante bajo FERPA:</strong>\n• Inspeccionar su expediente en 45 días\n• Solicitar corrección de información incorrecta\n• Presentar queja al Dept. de Educación de EE.UU.\n• Restringir la información de directorio\n\n📌 Fuente: studentprivacy.ed.gov/ferpa\n\n¿Tienes una situación específica de FERPA que necesites evaluar?`
+    keys: ['ferpa','privacidad','expediente','confidencial','divulgar','información personal','privacy','student privacy'],
+    reply: '🔒 <strong>FERPA — Family Educational Rights and Privacy Act</strong>\n\n<strong>¿Qué es?</strong> Ley federal (20 U.S.C. §1232g) que protege la privacidad de los expedientes educativos en instituciones con fondos federales como la UPR.\n\n<strong>Información de DIRECTORIO (puede divulgarse sin consentimiento):</strong>\n✅ Nombre | ✅ Programa de estudios | ✅ Fechas de asistencia\n✅ Grados obtenidos | ✅ Actividades extracurriculares\n\n<strong>Información NO divulgable sin consentimiento escrito:</strong>\n❌ Calificaciones | ❌ Número de Seguro Social\n❌ Expediente académico completo | ❌ Información financiera\n\n<strong>Excepciones:</strong>\n• Funcionarios con interés educativo legítimo\n• Emergencias de salud o seguridad\n• Orden judicial\n\n<strong>Derechos del estudiante:</strong>\n• Inspeccionar su expediente en 45 días\n• Solicitar corrección de errores\n• Presentar queja al Dept. de Educación federal\n\n📌 Fuente: studentprivacy.ed.gov/ferpa\n\n¿Tienes una situación específica de FERPA que evaluar?'
   },
   fechas: {
-    keys: ['fecha','plazo','deadline','calendario','retiro','incompleto','examen final','examen','final','semestre','matrícula 2025'],
-    reply: `📅 <strong>Calendario Académico — Semestre 2025-1</strong>\n\n⏰ <strong>Próximas fechas importantes:</strong>\n\n• <strong>15 de abril 2025</strong> — Último día para retiro de cursos\n• <strong>30 de abril 2025</strong> — Último día para solicitar incompletos\n• <strong>9 de mayo 2025</strong> — Último día para solicitar certificaciones antes del verano\n• <strong>5–16 de mayo 2025</strong> — Período de exámenes finales\n• <strong>24 de mayo 2025</strong> — Ceremonia de Graduación\n• <strong>1 de junio 2025</strong> — Inicio de matrícula Semestre 2025-2\n\n⚠️ Recuerda que los retiros después del plazo oficial requieren aprobación del Decano y pueden afectar el índice académico del estudiante.\n\n¿Necesitas información sobre alguna fecha específica o el proceso de retiro?`
+    keys: ['fecha','plazo','deadline','calendario','retiro','incompleto','examen final','semestre'],
+    reply: '📅 <strong>Calendario Académico — Semestre 2025-1</strong>\n\n• <strong>15 de abril 2025</strong> — Último día para retiro de cursos\n• <strong>30 de abril 2025</strong> — Último día para solicitar incompletos\n• <strong>9 de mayo 2025</strong> — Último día para certificaciones (antes del verano)\n• <strong>5–16 de mayo 2025</strong> — Exámenes finales\n• <strong>24 de mayo 2025</strong> — Ceremonia de Graduación\n• <strong>1 de junio 2025</strong> — Inicio matrícula Semestre 2025-2\n\n⚠️ Retiros tardíos requieren aprobación del Decano.\n\n¿Necesitas información sobre alguna fecha o proceso específico?'
   },
   costos: {
-    keys: ['costo','crédito','precio','cuánto cuesta','pago','arancel','matricula costo','tuition','cuanto cuesta'],
-    reply: `💰 <strong>Costos y Aranceles — UPR Río Piedras (2024-2025)</strong>\n\n<strong>Costo por crédito:</strong>\n• Residentes de Puerto Rico: <strong>$56.00 por crédito</strong>\n• No residentes (Estados Unidos): $156.00 por crédito\n• Estudiantes internacionales: $156.00 por crédito\n\n<strong>Costo semestral típico (15 créditos):</strong>\n• Residente PR: $840.00/semestre\n• No residente: $2,340.00/semestre\n\n<strong>Cargos adicionales comunes:</strong>\n• Cuota de actividades estudiantiles: $65/semestre\n• Seguro médico estudiantil: $120/semestre (opcional)\n• Cargo tecnológico: $45/semestre\n\n📌 La UPR es una de las universidades más asequibles del Caribe y la nación.\n\n¿Necesitas información sobre ayudas económicas o becas disponibles?`
+    keys: ['costo','crédito','precio','cuánto cuesta','pago','arancel','tuition','cuanto cuesta'],
+    reply: '💰 <strong>Costos y Aranceles — UPR Río Piedras (2024-2025)</strong>\n\n<strong>Por crédito:</strong>\n• Residentes de Puerto Rico: <strong>$56.00</strong>\n• No residentes / Internacionales: $156.00\n\n<strong>Semestre típico (15 créditos):</strong>\n• Residente PR: $840.00\n• No residente: $2,340.00\n\n<strong>Cargos adicionales:</strong>\n• Actividades estudiantiles: $65/semestre\n• Cargo tecnológico: $45/semestre\n• Seguro médico: $120/semestre (opcional)\n\n📌 La UPR es una de las universidades más asequibles del Caribe.\n\n¿Necesitas información sobre ayudas económicas o becas?'
   },
   certificaciones: {
-    keys: ['certificación','certificacion','carta','carta de estudios','verificación','verificacion','enrollment verification'],
-    reply: `📄 <strong>Certificaciones de Registraduría</strong>\n\n<strong>Solicitudes activas en proceso: 89</strong>\n⏳ Tiempo estimado de procesamiento: <strong>3 a 5 días hábiles</strong>\n\n⚠️ Durante períodos de alta demanda (inicio/fin de semestre, graduaciones) puede extenderse hasta 10 días hábiles.\n\n<strong>Tipos de certificaciones disponibles:</strong>\n• Carta de matrícula (enrollment letter)\n• Certificación de grado obtenido\n• Historial académico oficial (transcript)\n• Carta de buen estado académico\n• Certificación de candidatura a graduación\n\n<strong>Cómo solicitarlas:</strong>\n1. Portal estudiantil: miupi.upr.edu\n2. En persona: Edificio Monzón, Planta Baja\n3. Por correo electrónico: registrador@uprrp.edu\n\n📌 Recordatorio: Las certificaciones oficiales llevan el sello de la institución y la firma del Registrador.\n\n¿Necesitas tramitar una certificación específica?`
+    keys: ['certificación','certificacion','carta','carta de estudios','verificación','transcript'],
+    reply: '📄 <strong>Certificaciones de Registraduría</strong>\n\n<strong>Solicitudes activas: 89</strong>\n⏳ Tiempo estimado: <strong>3 a 5 días hábiles</strong>\n(hasta 10 días en períodos de alta demanda)\n\n<strong>Tipos disponibles:</strong>\n• Carta de matrícula (enrollment letter)\n• Certificación de grado obtenido\n• Historial académico oficial (transcript)\n• Carta de buen estado académico\n• Certificación de candidatura a graduación\n\n<strong>Cómo solicitarlas:</strong>\n1. Portal: miupi.upr.edu\n2. En persona: Edificio Monzón, Planta Baja\n3. Email: registrador@uprrp.edu\n\n¿Necesitas tramitar una certificación específica?'
   },
   regulaciones: {
-    keys: ['regulación','regulacion','reglamento','política','politica','norma','ley','certificación 98','ley 1'],
-    reply: `📋 <strong>Regulaciones Institucionales — UPR Río Piedras</strong>\n\n<strong>Normativas principales aplicables:</strong>\n\n📌 <strong>Ley Núm. 1 del 20 de enero de 1966</strong>\nLey de la Universidad de Puerto Rico — marco legal institucional\n\n📌 <strong>Reglamento General de la UPR</strong>\nGobierno universitario, estructura académica y administrativa\n\n📌 <strong>Certificación 98 (2014-2015) — Senado Académico</strong>\nReglamento de Estudiantes del Recinto de Río Piedras\n\n📌 <strong>Manual de Normas Académicas — UPRRP</strong>\nPolíticas de evaluación, repetición de cursos, probatoria académica\n\n📌 <strong>FERPA — 34 CFR Part 99</strong>\nPrivacidad de expedientes educativos (ley federal)\n\n📌 <strong>Middle States Commission — Estándares de Acreditación</strong>\nEstándares de calidad académica e institucional\n\n¿Necesitas información sobre una regulación específica o cómo aplica a un caso?`
+    keys: ['regulación','regulacion','reglamento','política','norma','ley','certificación 98'],
+    reply: '📋 <strong>Regulaciones Institucionales — UPR Río Piedras</strong>\n\n📌 <strong>Ley Núm. 1 (20 enero 1966)</strong> — Ley de la UPR\n📌 <strong>Reglamento General de la UPR</strong> — Gobierno y estructura\n📌 <strong>Certificación 98 (2014-2015)</strong> — Reglamento de Estudiantes UPRRP\n📌 <strong>Manual de Normas Académicas</strong> — Evaluación y probatoria\n📌 <strong>FERPA — 34 CFR Part 99</strong> — Privacidad de expedientes\n📌 <strong>Middle States Commission</strong> — Estándares de acreditación\n\n¿Necesitas información sobre cómo aplica alguna normativa a un caso específico?'
   },
   contacto: {
-    keys: ['contacto','teléfono','telefono','email','correo','dirección','direccion','oficina','horario','dónde','donde'],
-    reply: `📞 <strong>Directorio de Contactos — UPR Río Piedras</strong>\n\n🏢 <strong>Registraduría:</strong> (787) 764-0000 ext. 85530 | registrador@uprrp.edu\n💰 <strong>Tesorería:</strong> (787) 764-0000 ext. 85290 | tesoreria@uprrp.edu\n🎓 <strong>Decanato Académico:</strong> (787) 764-0000 ext. 85001 | decano.academico@uprrp.edu\n👥 <strong>RR.HH.:</strong> (787) 764-0000 ext. 85050 | rrhh@uprrp.edu\n🏫 <strong>Estudiantes:</strong> (787) 764-0000 ext. 85380 | estudiantes@uprrp.edu\n\n🕐 Horario general: Lunes a Viernes, 7:30am – 4:30pm\n\nPuedes ver el directorio completo en el tab de <strong>📞 Contactos</strong> arriba.\n\n¿Necesitas el contacto de alguna otra oficina específica?`
+    keys: ['contacto','teléfono','telefono','email','correo','oficina','horario','dónde','donde'],
+    reply: '📞 <strong>Directorio de Contactos — UPR Río Piedras</strong>\n\n🏢 <strong>Registraduría:</strong> (787) 764-0000 ext. 85530\n💰 <strong>Tesorería:</strong> (787) 764-0000 ext. 85290\n🎓 <strong>Decanato Académico:</strong> (787) 764-0000 ext. 85001\n👥 <strong>RR.HH.:</strong> (787) 764-0000 ext. 85050\n🏫 <strong>Estudiantes:</strong> (787) 764-0000 ext. 85380\n\n🕐 Horario general: Lunes a Viernes, 7:30am – 4:30pm\n\nVer directorio completo en el tab <strong>📞 Contactos</strong>.'
   },
   online: {
-    keys: ['online','virtual','distancia','en línea','linea','cursos en línea','cursos online','híbrido'],
-    reply: `💻 <strong>Cursos en Línea — UPR Río Piedras (2024-2025)</strong>\n\n• Estudiantes exclusivamente en línea: <strong>177</strong>\n• Estudiantes en algún curso online: <strong>1,393</strong>\n• Plataforma principal: <strong>Moodle</strong> (moodle.uprrp.edu)\n\n<strong>Políticas de cursos en línea:</strong>\n• Los cursos híbridos y en línea aparecen identificados en el catálogo con el código (WEB) u (HYB)\n• Los estudiantes deben tener acceso a internet y los requisitos técnicos mínimos indicados en el syllabus\n• FERPA aplica igualmente para registros de cursos en línea\n\n¿Tienes una consulta específica sobre matrícula en cursos en línea?`
+    keys: ['online','virtual','distancia','en línea','linea','moodle'],
+    reply: '💻 <strong>Cursos en Línea — UPR Río Piedras (2024-2025)</strong>\n\n• Estudiantes exclusivamente en línea: <strong>177</strong>\n• Estudiantes en algún curso online: <strong>1,393</strong>\n• Plataforma: <strong>Moodle</strong> (moodle.uprrp.edu)\n\nLos cursos en línea se identifican con los códigos (WEB) o (HYB) en el catálogo. FERPA aplica igualmente para todos los registros en línea.\n\n¿Tienes alguna consulta sobre matrícula en cursos en línea?'
   }
 };
  
-const NO_INFO = `🤔 En este momento no tenemos información suficiente en nuestra base de datos para responder esa consulta específica.\n\nEste sistema se encuentra en <strong>constante actualización y mejora</strong> — te recomendamos:\n\n1. Contactar directamente la oficina correspondiente (ver tab 📞 Contactos)\n2. Regresar más adelante cuando el sistema esté actualizado\n3. Enviar tu consulta a: <strong>unidata@uprrp.edu</strong>\n\n¿Puedo ayudarte con algo más relacionado a matrícula, FERPA, trámites, fechas o costos?`;
+var NO_INFO = '🤔 En este momento no tenemos información suficiente en nuestra base de datos para responder esa consulta.\n\nEste sistema está en <strong>constante actualización</strong> — te recomendamos:\n\n1. Usar el tab <strong>📞 Contactos</strong> para comunicarte con la oficina directamente\n2. Enviar tu consulta a: <strong>unidata@uprrp.edu</strong>\n3. Regresar más adelante cuando el sistema esté actualizado\n\n¿Puedo ayudarte con matrícula, FERPA, trámites, fechas o costos?';
  
 function getResponse(q) {
-  const lower = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  for (const key in KB) {
-    if (KB[key].keys.some(k => lower.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g,'')))) {
-      return KB[key].reply;
-    }
+  var lower = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  for (var key in KB) {
+    var found = KB[key].keys.some(function(k) {
+      return lower.includes(k.normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+    });
+    if (found) return KB[key].reply;
   }
   return NO_INFO;
 }
  
-// ── FAQ ──
-const FAQS = [
-  { q:'¿Qué es IA-UniData?', a:'IA-UniData es un asistente de inteligencia artificial desarrollado por el equipo UniData UPR para centralizar la información institucional de la UPR Río Piedras. Permite consultar datos de matrícula, trámites, regulaciones y contactos sin necesidad de llamar a múltiples oficinas.' },
-  { q:'¿Cuántos estudiantes tiene la UPR Río Piedras?', a:'Para el año académico 2024-2025, la UPR Río Piedras tiene 11,312 estudiantes: 8,710 subgraduados y 2,602 graduados. Por género: 4,380 hombres (39%) y 6,932 mujeres (61%). Fuente: IPEDS 2024-2025.' },
-  { q:'¿Qué es FERPA y cómo aplica en la UPR?', a:'FERPA (Family Educational Rights and Privacy Act) es la ley federal que protege la privacidad de los expedientes educativos. En la UPR, los empleados no pueden divulgar información académica de estudiantes sin su consentimiento escrito, excepto en situaciones específicas como traslados a otras instituciones o emergencias de salud.' },
-  { q:'¿Cuánto tiempo tarda una certificación de Registraduría?', a:'Las certificaciones tienen un tiempo estimado de 3 a 5 días hábiles. Durante períodos de alta demanda (inicio/fin de semestre, graduaciones) puede extenderse hasta 10 días hábiles. Actualmente hay 89 solicitudes activas en procesamiento.' },
-  { q:'¿Cuándo es la próxima ceremonia de graduación?', a:'La próxima ceremonia de graduación está programada para el 24 de mayo de 2025. Hay 1,043 candidatos: 953 aprobados, 67 pendientes de verificación y 23 con deficiencias activas.' },
-  { q:'¿Cuál es el costo por crédito en la UPR?', a:'Para 2024-2025: $56 por crédito para residentes de Puerto Rico y $156 para no residentes. Un estudiante típico con 15 créditos pagaría $840 por semestre siendo residente.' },
-  { q:'¿Cómo reporto un error en el expediente de un estudiante?', a:'El estudiante debe: (1) presentarse en Registraduría con identificación oficial, (2) completar el formulario de Solicitud de Corrección de Expediente, (3) adjuntar documentación que evidencie el error. Bajo FERPA, el estudiante tiene derecho a solicitar corrección. El proceso toma 5 a 15 días hábiles.' },
-  { q:'¿Qué hago si el sistema no tiene la información que necesito?', a:'Si IA-UniData no puede responder tu consulta, verás un mensaje indicando que la información no está disponible y opciones de contacto alternativas. Puedes usar el tab de Contactos para comunicarte directamente con la oficina correspondiente.' }
+// ════════════════════════════════════
+// FAQ
+// ════════════════════════════════════
+var FAQS = [
+  { q:'¿Qué es IA-UniData?', a:'IA-UniData es un asistente de inteligencia artificial del equipo UniData UPR que centraliza la información institucional de la UPR Río Piedras. Permite consultar datos de matrícula, trámites, regulaciones y contactos sin llamar a múltiples oficinas.' },
+  { q:'¿Cuántos estudiantes tiene la UPR Río Piedras?', a:'Para el año 2024-2025: 11,312 estudiantes totales — 8,710 subgraduados y 2,602 graduados. Por género: 4,380 hombres (39%) y 6,932 mujeres (61%). Fuente: IPEDS 2024-2025.' },
+  { q:'¿Qué es FERPA y cómo aplica en la UPR?', a:'FERPA es la ley federal que protege la privacidad de los expedientes educativos. En la UPR, no puedes divulgar información académica de estudiantes sin su consentimiento escrito, excepto a funcionarios con interés educativo legítimo o en emergencias de salud.' },
+  { q:'¿Cuánto tiempo tarda una certificación?', a:'Entre 3 y 5 días hábiles normalmente. En períodos de alta demanda puede extenderse hasta 10 días. Hay 89 solicitudes activas actualmente.' },
+  { q:'¿Cuándo es la próxima graduación?', a:'El 24 de mayo de 2025 en el Coliseo Rafael A. Mangual. Hay 1,043 candidatos: 953 aprobados, 67 pendientes y 23 con deficiencias.' },
+  { q:'¿Cuánto cuesta el crédito en la UPR?', a:'$56 por crédito para residentes de Puerto Rico. $156 para no residentes. Un semestre típico de 15 créditos cuesta $840 para residentes.' },
+  { q:'¿Cómo activo la IA avanzada con Groq?', a:'Crea una cuenta gratuita en console.groq.com, genera una API key y pégala en el campo amarillo en la parte superior de esta página. Groq ofrece un plan gratuito con suficientes llamadas para el proyecto.' },
+  { q:'¿Qué hago si el sistema no tiene la info que necesito?', a:'El sistema te mostrará opciones de contacto alternativas. Puedes ir al tab de Contactos o escribir a unidata@uprrp.edu. El sistema está en constante actualización.' }
 ];
  
 function buildFAQ() {
-  document.getElementById('faqList').innerHTML = FAQS.map((f,i)=>`
-    <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">${f.q}<span class="faq-arr">▼</span></div>
-      <div class="faq-a">${f.a}</div>
-    </div>`).join('');
+  document.getElementById('faqList').innerHTML = FAQS.map(function(f) {
+    return '<div class="faq-item" onclick="this.classList.toggle(\'open\')">' +
+      '<div class="faq-q">' + f.q + '<span class="faq-arr">▼</span></div>' +
+      '<div class="faq-a">' + f.a + '</div>' +
+      '</div>';
+  }).join('');
 }
 </script>
 </body>
