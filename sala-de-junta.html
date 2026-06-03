@@ -221,6 +221,25 @@
     justify-content: center; font-size: 10px; color: #c7d2fe;
     flex-shrink: 0; margin-top: 2px; font-weight: 700;
   }
+
+/* --- BARRA DE DESPLAZAMIENTO PERSONALIZADA --- */
+  .chat-messages::-webkit-scrollbar {
+    width: 6px; /* Ancho de la barra */
+  }
+
+  .chat-messages::-webkit-scrollbar-track {
+    background: #0d1117; /* Fondo del chat (#0d1117) */
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: #1e293b; /* Color gris oscuro de tus bordes */
+    border-radius: 10px;
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #6366f1; /* Tu color índigo brillante */
+  }
+ 
   .bubble {
     max-width: 74%; padding: 11px 15px; border-radius: 14px;
     font-size: 13px; line-height: 1.65;
