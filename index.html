@@ -545,7 +545,12 @@
  
 </body>
   <script>
-    
+    // ── AUTH CHECK ──
+window.onload = function() {
+  if (localStorage.getItem('unidata_logged_in') !== 'true') {
+    window.location.href = 'Login Page.html';
+    return;
+  }
   </script>
 </html>
  
