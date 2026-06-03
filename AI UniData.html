@@ -235,7 +235,7 @@ var isLoading = false;
 window.onload = function() {
   // Verificar login
   if (localStorage.getItem('unidata_logged_in') !== 'true') {
-    window.location.href = 'login.html';
+    window.location.href = 'Login Page.html';
     return;
   }
  
@@ -280,7 +280,7 @@ function logout() {
   localStorage.removeItem('unidata_logged_in');
   localStorage.removeItem('unidata_user');
   localStorage.removeItem('groq_api_key');
-  window.location.href = 'login.html';
+  window.location.href = 'Login Page.html';
 }
  
 // ════════════════════════════════════
