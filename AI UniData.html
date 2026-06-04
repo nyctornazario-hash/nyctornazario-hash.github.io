@@ -157,9 +157,9 @@
   <!-- CHAT -->
   <div class="panel visible" id="chatPanel">
     <div class="user-badge">
-      <div class="user-avatar" id="userInitials">CM</div>
+      <div class="user-avatar" id="userInitials">DU</div>
       <div>
-        <div class="user-name" id="userName">Carmen Morales</div>
+        <div class="user-name" id="userName">Demo User</div>
         <div class="user-dept">Oficina de Registraduría · UPR Río Piedras</div>
       </div>
       <div class="user-online"><div class="online-dot"></div>En línea</div>
@@ -309,7 +309,7 @@ function addMsg(role, html) {
   if (role === 'ai') {
     row.innerHTML = '<div class="msg-ai">U</div><div class="bubble ai">' + content + '</div>';
   } else {
-    row.innerHTML = '<div class="bubble usr">' + content + '</div><div class="msg-user-av">CM</div>';
+    row.innerHTML = '<div class="bubble usr">' + content + '</div><div class="msg-user-av">DU</div>';
   }
   box.appendChild(row);
   box.scrollTop = box.scrollHeight;
