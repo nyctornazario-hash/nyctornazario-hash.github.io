@@ -1,0 +1,81 @@
+// ==================== BASE DE DATOS DIIA OFICIAL ====================
+const datosDIIA = `
+ESTADÍSTICAS OFICIALES UPR RÍO PIEDRAS - DIIA (2020-2026)
+
+1. MATRÍCULA TOTAL (Primer Semestre)
+- 2025-2026: 12,116 estudiantes (F: 7,403 | M: 4,626)
+- 2024-2025: 11,393
+- 2023-2024: 11,556
+- 2022-2023: 12,037
+- 2021-2022: 13,226
+- 2020-2021: 13,892
+
+2. GRADOS CONFERIDOS
+- 2024-2025: 2,137
+- 2023-2024: 2,134
+- 2022-2023: 2,031
+- 2021-2022: 2,329
+- 2020-2021: 2,466
+
+3. PRESUPUESTO ORIGINAL
+- 2025-2026: $176,117,196
+- 2024-2025: $172,048,404
+- 2023-2024: $175,253,200
+- 2022-2023: $175,565,543
+- 2021-2022: $170,504,286
+
+4. ESTUDIANTES INTERNACIONALES (Primer Semestre)
+- 2025-2026: 120
+- 2024-2025: 112
+- 2023-2024: 110
+- 2022-2023: 137
+
+5. OTRAS ESTADÍSTICAS
+- Retención subgraduada 2024: 81.1%
+- Docentes con publicaciones 2024-25: 214
+- Investigaciones activas 2024-25: 338
+`;
+
+async function llamarAPI(mensajeUsuario, apiKey) {
+  let contextoEstatico = `Eres IA-UniData, el asistente oficial de la Universidad de Puerto Rico, Recinto de Río Piedras.
+
+DATOS ACTUALIZADOS (DIIA 2020-2026):
+${datosDIIA}
+
+Instrucciones:
+- Responde siempre en español de Puerto Rico.
+- Usa los números exactos cuando te pregunten por matrícula, presupuesto, grados, internacionales, etc.
+- Sé claro, amable y organizado. Usa viñetas cuando des varios datos.
+`;
+
+  const url = "https://api.groq.com/openai/v1/chat/completions";
+  
+  try {
+    const respuesta = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + apiKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        messages: [
+          { role: "system", content: contextoEstatico },
+          { role: "user", content: mensajeUsuario }
+        ],
+        temperature: 0.2,
+        max_tokens: 900
+      })
+    });
+
+    const datos = await respuesta.json();
+    if (!respuesta.ok) throw new Error(datos.error?.message || "Error desconocido");
+
+    const textoRespuesta = datos.choices[0].message.content.replace(/\n/g, '<br>');
+    agregarMensaje('ai', textoRespuesta);
+
+  } catch (error) {
+    console.error(error);
+    agregarMensaje('ai', `⚠️ Error: ${error.message}<br>Verifica tu API Key.`);
+  }
+}
